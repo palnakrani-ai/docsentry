@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: docsentry
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: "7860"
