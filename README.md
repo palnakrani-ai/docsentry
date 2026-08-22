@@ -12,7 +12,9 @@ pinned: false
 
 A RAG document Q&A demo with guardrails. It answers questions about a fictional outdoor gear retailer, Meridian Outfitters, strictly from the company's handbook and policy documents. Every answer carries citations, anything outside the docs gets a polite refusal, and prompt injection attempts are flagged and ignored. Ships as a single Docker image for Hugging Face Spaces.
 
-Stack: FastAPI, ChromaDB (embedded, index built at Docker build time), Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI.
+Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-chroma`), Chroma embedded with the index built at Docker build time, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional LangSmith tracing.
+
+The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee.
 
 ## Guardrails
 
@@ -52,6 +54,8 @@ npm run dev                           # or run the Vite dev server instead
 Without a built frontend, the root URL serves a plain status message and the API remains fully usable.
 
 Env vars: `GEMINI_API_KEY` (required), `GEMINI_MODEL` (default `gemini-flash-lite-latest`), `GEMINI_EMBED_MODEL` (default `gemini-embedding-001`, auto-falls back to `text-embedding-004` on 404), `PORT` (Spaces sets 7860).
+
+Tracing is optional and off unless you set all three: `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`. With them set, every request shows up in LangSmith as a four-step trace with token counts, per-step latency and the retrieved chunks.
 
 ## Deploy to Hugging Face Spaces
 

@@ -4,8 +4,11 @@ Portfolio demo #2. A RAG chatbot over a fictional company handbook that answers 
 
 ## Stack
 
-- Python 3.11, FastAPI, LangChain (text splitting + retrieval plumbing)
-- ChromaDB embedded, persisted to ./chroma_index, PRE-BUILT at Docker build time
+- Python 3.11, FastAPI
+- LangChain 1.0: the answer path is an LCEL chain (`retrieve -> grounding gate -> generate -> verify`) built from `langchain-google-genai`, `langchain-chroma` and `langchain-text-splitters`. Structured output via `.with_structured_output(AnswerPayload)`, one retry via `.with_retry`, and a fallback that degrades a model failure into a refusal rather than a 503
+- Grounding, citation verification and injection screening are NOT in the prompt. They run as plain Python inside Runnables, because an instruction to a model is not a guarantee. See `_is_ungrounded` and `_verify_and_build` in `app/rag.py`
+- LangSmith tracing, off by default. Set `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY` and `LANGSMITH_PROJECT` to get per-step traces with token counts and latency
+- Chroma embedded, persisted to ./chroma_index, PRE-BUILT at Docker build time. The embedding model used at ingest is recorded in the collection metadata and read back at query time, so a fallback at build time cannot silently mismatch the query embeddings
 - Gemini free tier: `gemini-flash-lite-latest` for answers (env GEMINI_MODEL overrides), `gemini-embedding-001` for embeddings (env GEMINI_EMBED_MODEL overrides; if unavailable fall back to `text-embedding-004`)
 - React + Vite chat UI, built to static files, served by FastAPI
 - Docker multi-stage: node build of frontend, python runtime, ingest run during build so the Space boots with a ready index

@@ -107,12 +107,7 @@ def health() -> HealthResponse:
     documents = 0
     chunks = 0
     try:
-        collection = rag.get_collection()
-        chunks = collection.count()
-        records = collection.get(include=["metadatas"])
-        documents = len(
-            {m.get("source") for m in records["metadatas"] if m.get("source")}
-        )
+        documents, chunks = rag.collection_stats()
     except Exception:
         pass  # index not built yet; report zeros rather than crash
     return HealthResponse(status="ok", documents=documents, chunks=chunks)
@@ -122,10 +117,8 @@ def health() -> HealthResponse:
 def sources() -> SourcesResponse:
     infos: list[SourceInfo] = []
     try:
-        collection = rag.get_collection()
-        records = collection.get(include=["metadatas"])
         by_source: dict[str, dict] = {}
-        for meta in records["metadatas"]:
+        for meta in rag.collection_metadatas():
             source = meta.get("source", "unknown")
             entry = by_source.setdefault(
                 source, {"title": meta.get("title", source), "sections": set()}

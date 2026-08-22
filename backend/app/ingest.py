@@ -1,8 +1,9 @@
-"""Ingest docs/*.md into a persistent Chroma index.
+"""Ingest docs/*.md into a persistent Chroma index via LangChain.
 
 Splits each markdown file per "## " section, then recursively into ~800-char
-chunks with overlap, embeds via Gemini, and stores everything in a Chroma
-collection with {source, section, title} metadata.
+chunks with overlap, embeds with Gemini through LangChain's embedding
+interface, and stores everything in a Chroma collection with
+{source, section, title} metadata.
 
 Runnable standalone:  python -m app.ingest
 Idempotent: the collection is dropped and recreated on every run.
@@ -13,10 +14,9 @@ import re
 import sys
 from pathlib import Path
 
-import chromadb
-from google import genai
-from google.genai import types as genai_types
-from google.genai.errors import ClientError
+from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Paths resolve relative to this package so they work both locally
@@ -29,65 +29,41 @@ COLLECTION_NAME = "docsentry"
 
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 120
-EMBED_BATCH_SIZE = 50
 
 PRIMARY_EMBED_MODEL = os.environ.get("GEMINI_EMBED_MODEL", "gemini-embedding-001")
 FALLBACK_EMBED_MODEL = "text-embedding-004"
 
 
-def _gemini_client() -> genai.Client:
+def _api_key() -> str:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY environment variable is not set.")
-    return genai.Client(api_key=api_key)
+    return api_key
 
 
-def _embed_batch(
-    client: genai.Client, model: str, texts: list[str], task_type: str
-) -> list[list[float]]:
-    result = client.models.embed_content(
-        model=model,
-        contents=texts,
-        config=genai_types.EmbedContentConfig(task_type=task_type),
-    )
-    return [list(e.values) for e in result.embeddings]
+def _qualified(model: str) -> str:
+    """langchain-google-genai expects the 'models/' prefix."""
+    return model if model.startswith("models/") else f"models/{model}"
 
 
-def embed_texts(
-    client: genai.Client, texts: list[str], task_type: str = "RETRIEVAL_DOCUMENT"
-) -> tuple[list[list[float]], str]:
-    """Embed texts, falling back to FALLBACK_EMBED_MODEL if the primary 404s.
+def build_embeddings(model: str = PRIMARY_EMBED_MODEL) -> GoogleGenerativeAIEmbeddings:
+    """Embeddings for both indexing and querying.
 
-    Returns (embeddings, model_used).
+    task_type is deliberately left unset: the class then uses
+    retrieval_document for embed_documents and retrieval_query for
+    embed_query, which is the asymmetry this corpus wants.
     """
-    model = PRIMARY_EMBED_MODEL
-    embeddings: list[list[float]] = []
-    for start in range(0, len(texts), EMBED_BATCH_SIZE):
-        batch = texts[start : start + EMBED_BATCH_SIZE]
-        try:
-            embeddings.extend(_embed_batch(client, model, batch, task_type))
-        except ClientError as exc:
-            if getattr(exc, "code", None) == 404 and model != FALLBACK_EMBED_MODEL:
-                print(
-                    f"[ingest] model {model} unavailable (404); "
-                    f"retrying with {FALLBACK_EMBED_MODEL}",
-                    file=sys.stderr,
-                )
-                model = FALLBACK_EMBED_MODEL
-                # Restart from scratch so all vectors come from one model.
-                return embed_texts_with_model(client, texts, model, task_type)
-            raise
-    return embeddings, model
+    return GoogleGenerativeAIEmbeddings(
+        model=_qualified(model),
+        google_api_key=_api_key(),
+    )
 
 
-def embed_texts_with_model(
-    client: genai.Client, texts: list[str], model: str, task_type: str
-) -> tuple[list[list[float]], str]:
-    embeddings: list[list[float]] = []
-    for start in range(0, len(texts), EMBED_BATCH_SIZE):
-        batch = texts[start : start + EMBED_BATCH_SIZE]
-        embeddings.extend(_embed_batch(client, model, batch, task_type))
-    return embeddings, model
+def _is_model_missing(exc: Exception) -> bool:
+    """True when Gemini rejected the embedding model as unavailable (404)."""
+    if getattr(exc, "code", None) == 404:
+        return True
+    return "404" in str(exc) or "not found" in str(exc).lower()
 
 
 def _split_sections(text: str) -> tuple[str, list[tuple[str, str]]]:
@@ -116,8 +92,8 @@ def _split_sections(text: str) -> tuple[str, list[tuple[str, str]]]:
     return title, sections
 
 
-def build_chunks() -> tuple[list[str], list[str], list[dict]]:
-    """Return (ids, documents, metadatas) for all markdown files in docs/."""
+def build_chunks() -> tuple[list[str], list[Document]]:
+    """Return (ids, documents) for all markdown files in docs/."""
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=CHUNK_SIZE,
         chunk_overlap=CHUNK_OVERLAP,
@@ -125,8 +101,7 @@ def build_chunks() -> tuple[list[str], list[str], list[dict]]:
     )
 
     ids: list[str] = []
-    documents: list[str] = []
-    metadatas: list[dict] = []
+    documents: list[Document] = []
 
     md_files = sorted(DOCS_DIR.glob("*.md"))
     if not md_files:
@@ -141,35 +116,62 @@ def build_chunks() -> tuple[list[str], list[str], list[dict]]:
             for j, chunk in enumerate(splitter.split_text(section_text)):
                 slug = re.sub(r"[^a-z0-9]+", "-", section_heading.lower()).strip("-")
                 ids.append(f"{path.stem}::{slug}::{j}")
-                documents.append(chunk)
-                metadatas.append(
-                    {"source": source, "section": section_heading, "title": title}
+                documents.append(
+                    Document(
+                        page_content=chunk,
+                        metadata={
+                            "source": source,
+                            "section": section_heading,
+                            "title": title,
+                        },
+                    )
                 )
-    return ids, documents, metadatas
+    return ids, documents
+
+
+def _write_index(ids: list[str], documents: list[Document], model: str) -> Chroma:
+    return Chroma.from_documents(
+        documents=documents,
+        ids=ids,
+        embedding=build_embeddings(model),
+        collection_name=COLLECTION_NAME,
+        persist_directory=str(CHROMA_DIR),
+        collection_metadata={"hnsw:space": "cosine", "embed_model": model},
+    )
 
 
 def main() -> None:
-    ids, documents, metadatas = build_chunks()
-    n_docs = len({m["source"] for m in metadatas})
+    ids, documents = build_chunks()
+    n_docs = len({d.metadata["source"] for d in documents})
     print(f"[ingest] {n_docs} documents -> {len(documents)} chunks")
 
-    client = _gemini_client()
-    embeddings, model_used = embed_texts(client, documents)
-    print(f"[ingest] embedded with {model_used}")
-
-    chroma = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    # Drop the old collection so re-running is idempotent and every vector in
+    # the index comes from a single embedding model.
     try:
-        chroma.delete_collection(COLLECTION_NAME)
+        Chroma(
+            collection_name=COLLECTION_NAME,
+            persist_directory=str(CHROMA_DIR),
+        ).delete_collection()
     except Exception:
         pass  # first run, nothing to delete
-    collection = chroma.create_collection(
-        COLLECTION_NAME,
-        metadata={"hnsw:space": "cosine", "embed_model": model_used},
-    )
-    collection.add(
-        ids=ids, documents=documents, embeddings=embeddings, metadatas=metadatas
-    )
-    print(f"[ingest] wrote {collection.count()} chunks to {CHROMA_DIR}")
+
+    model = PRIMARY_EMBED_MODEL
+    try:
+        store = _write_index(ids, documents, model)
+    except Exception as exc:
+        if not _is_model_missing(exc) or model == FALLBACK_EMBED_MODEL:
+            raise
+        print(
+            f"[ingest] model {model} unavailable (404); "
+            f"retrying with {FALLBACK_EMBED_MODEL}",
+            file=sys.stderr,
+        )
+        model = FALLBACK_EMBED_MODEL
+        store = _write_index(ids, documents, model)
+
+    print(f"[ingest] embedded with {model}")
+    written = len(store.get(include=[])["ids"])
+    print(f"[ingest] wrote {written} chunks to {CHROMA_DIR}")
 
 
 if __name__ == "__main__":
