@@ -238,8 +238,15 @@ def _build_chain() -> Any:
     # repair prompt: structured output already re-asks with the schema. If it
     # still fails, fall back to an unconfident payload so the verifier below
     # refuses, rather than letting the exception reach the caller as a 503.
+    # method="json_mode" is load-bearing, not a style choice. The default
+    # (tool calling) returns None on roughly two runs in three with
+    # gemini-flash-lite, which the verifier below correctly turns into a
+    # refusal, so the failure looks like a grounding decision rather than a
+    # broken model call. json_mode maps to response_mime_type=application/json
+    # plus the schema, which is what this pipeline used before LangChain and
+    # what it needs to stay reliable.
     structured = (
-        model.with_structured_output(AnswerPayload)
+        model.with_structured_output(AnswerPayload, method="json_mode")
         .with_retry(stop_after_attempt=2)
         .with_fallbacks([RunnableLambda(lambda _: AnswerPayload(answer=""))])
     )
