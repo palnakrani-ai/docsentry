@@ -186,7 +186,13 @@ def _verify_and_build(state: dict[str, Any]) -> RagResult:
     exists in what was retrieved, and said it was confident. Citations pointing
     at chunks that were never retrieved are dropped rather than trusted.
     """
-    payload: AnswerPayload = state["payload"]
+    payload: AnswerPayload | None = state["payload"]
+    if payload is None:
+        # with_structured_output returns None rather than raising when the
+        # model produces nothing parseable, so the fallback above never fires.
+        # No payload means no grounded answer, which means refuse.
+        return _refuse()
+
     by_label = {c.label: c for c in state["chunks"]}
     cited = [by_label[cid] for cid in payload.citedChunkIds if cid in by_label]
 
