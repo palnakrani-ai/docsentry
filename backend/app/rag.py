@@ -25,7 +25,7 @@ from langchain_core.runnables import (
 from langchain_google_genai import ChatGoogleGenerativeAI
 from pydantic import BaseModel, Field
 
-from .guardrails import FLAG_OFF_TOPIC, GROUNDING_SCORE_THRESHOLD
+from .guardrails import FLAG_MODEL_UNAVAILABLE, FLAG_OFF_TOPIC, GROUNDING_SCORE_THRESHOLD
 from .ingest import (
     CHROMA_DIR,
     COLLECTION_NAME,
@@ -78,6 +78,17 @@ class RagResult:
     citations: list[Citation]
     refused: bool
     flags: list[str] = field(default_factory=list)
+    # Full text of every chunk that was retrieved for this question, not only
+    # the ones the model cited and not truncated. The API never returns this;
+    # it exists so evaluation can judge faithfulness against the context the
+    # model actually saw. Scoring against the 200-character citation snippet
+    # measures the snippet, not the system.
+    retrieved_contexts: list[str] = field(default_factory=list)
+
+
+# Sentinel payload returned by the generation fallback. Identity-compared, so it
+# must be a single shared instance rather than a freshly built equal one.
+MODEL_UNAVAILABLE = AnswerPayload(answer="")
 
 
 @dataclass
@@ -187,6 +198,13 @@ def _verify_and_build(state: dict[str, Any]) -> RagResult:
     at chunks that were never retrieved are dropped rather than trusted.
     """
     payload: AnswerPayload | None = state["payload"]
+
+    if payload is MODEL_UNAVAILABLE:
+        # The generation call failed after its retries. This is an outage, not a
+        # grounding decision, and it is flagged so an evaluation does not score
+        # it as a correct refusal.
+        return _refuse([FLAG_MODEL_UNAVAILABLE])
+
     if payload is None:
         # with_structured_output returns None rather than raising when the
         # model produces nothing parseable, so the fallback above never fires.
@@ -211,6 +229,7 @@ def _verify_and_build(state: dict[str, Any]) -> RagResult:
         answer=payload.answer.strip() or REFUSAL_MESSAGE,
         citations=citations,
         refused=False,
+        retrieved_contexts=[c.text for c in state["chunks"]],
     )
 
 
@@ -245,10 +264,13 @@ def _build_chain() -> Any:
     # broken model call. json_mode maps to response_mime_type=application/json
     # plus the schema, which is what this pipeline used before LangChain and
     # what it needs to stay reliable.
+    # A distinct object rather than a plain empty payload, so the verifier can
+    # tell "the model call failed" apart from "the model answered badly". Both
+    # end in a refusal, but only one of them means the system is broken.
     structured = (
         model.with_structured_output(AnswerPayload, method="json_mode")
         .with_retry(stop_after_attempt=2)
-        .with_fallbacks([RunnableLambda(lambda _: AnswerPayload(answer=""))])
+        .with_fallbacks([RunnableLambda(lambda _: MODEL_UNAVAILABLE)])
     )
 
     generate = RunnablePassthrough.assign(

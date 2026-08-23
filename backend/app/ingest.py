@@ -39,7 +39,9 @@ EMBED_COOLDOWN_SECONDS = 40
 EMBED_MAX_RETRIES = 5
 
 PRIMARY_EMBED_MODEL = os.environ.get("GEMINI_EMBED_MODEL", "gemini-embedding-001")
-FALLBACK_EMBED_MODEL = "text-embedding-004"
+# text-embedding-004 was retired and now 404s, which made the fallback path a
+# dead end: a 404 on the primary model fell through to another 404.
+FALLBACK_EMBED_MODEL = "gemini-embedding-2"
 
 
 def _api_key() -> str:
