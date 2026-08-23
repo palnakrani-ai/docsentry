@@ -4,7 +4,7 @@ This document covers goal setting, review cycles, promotion, and the process whe
 
 ## Goals
 
-Goals are set within the first 30 days of the calendar year, or within 30 days of a hire or role change. Each employee holds between 3 and 5 goals. Fewer than 3 usually means the role is under-scoped, and more than 5 usually means nothing is prioritized.
+Goals are set within the first 30 days of the calendar year, or within 30 days of a hire or role change, and are reviewed at both the June and December points. Each employee holds between 3 and 5 goals. Fewer than 3 usually means the role is under-scoped, and more than 5 usually means nothing is prioritized.
 
 Goals state an outcome rather than an activity. "Reduce support first response time to 4 business hours" is a goal. "Work on response times" is not.
 
@@ -12,9 +12,9 @@ Goals are revised mid-year where circumstances change. A goal that has become im
 
 ## Review Cycle
 
-There is one formal review per year, in January, covering the prior calendar year. It informs the pay decision made in the same cycle.
+Formal reviews happen twice a year, in June and December, as stated in the Employee Handbook. The December cycle carries the rating that informs merit increases, which take effect January 1. The June cycle produces a rating but no pay decision.
 
-There is a lightweight mid-year check-in in July with no rating and no pay implication. Its purpose is to surface problems while there is still time to act on them.
+Promotion decisions can be made in either cycle.
 
 Managers hold one-to-ones at least every two weeks. Feedback is expected continuously. Nothing in a formal review should be new information to the employee, and a surprise at review time is a management failure rather than an employee one.
 
@@ -38,7 +38,7 @@ HR reviews calibration outcomes for patterns by demographic group and raises any
 
 Promotion recognizes that an employee is already operating at the next level, rather than predicting they could. Meridian does not promote on potential alone, because the failure mode is promoting someone into a role they then have to grow into without support.
 
-Promotions are decided in the January cycle and in an off-cycle review in July. A manager may propose a promotion at any time, though the decision is made in one of the two windows.
+Promotions are decided in either the June or the December cycle. A manager may propose a promotion at any time, though the decision is made in one of the two windows.
 
 Promotion requires a written case covering scope, sustained performance at the higher level, and the business need for the role. The case is reviewed by the manager's manager and by HR.
 

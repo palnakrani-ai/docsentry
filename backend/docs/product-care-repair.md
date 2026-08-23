@@ -6,7 +6,7 @@ Meridian repairs what it sells. This document covers the repair service, what it
 
 A warranty claim covers a defect in materials or workmanship and is free to the customer when approved. See the Warranty Policy for coverage and exclusions.
 
-A repair covers damage from use, accident, or wear, which the warranty does not cover. Repairs are a paid service, with the exception of the one free repair per year available to Summit tier members under the Summit Rewards program.
+A repair covers damage from use, accident, or wear, which the warranty does not cover. Repairs are a paid service, with the exception of the one free repair per year available to Alpine tier members under the Summit Rewards program.
 
 If a customer submits a repair and the assessment finds a manufacturing defect, the item is converted to a warranty claim and no repair charge applies. The reverse also happens: warranty claims found to be use damage are quoted as repairs, and the customer decides whether to proceed.
 
@@ -30,17 +30,16 @@ We do not repair items from other brands, with one exception: packs and jackets 
 
 Assessment is free. The customer ships the item at their own cost, or drops it at any of the 12 retail locations, and the shop quotes within 5 business days of receipt.
 
-Typical repair pricing:
+Starting prices are published in the Warranty Policy: zipper replacement from $25, seam and fabric repair from $20, and tent pole section replacement from $15 plus parts. Those are floors rather than typical costs, and the quote reflects the actual work.
 
-- Zipper replacement: $35 to $85 depending on length and type
-- Fabric tear patch: $25 to $60
-- Membrane re-lamination: $70 to $140
-- Hardware replacement: $15 to $45
-- Down work: $50 to $120
+Two repair types not listed there:
 
-Turnaround is 10 to 15 business days once the quote is approved, and extends to 20 to 30 business days between May 1 and August 31, which is the shop's busy season. Return shipping is free on all completed repairs.
+- Membrane re-lamination: from $70
+- Down redistribution and baffle work: from $50
 
-Quotes are held for 30 days. An item whose quote is not approved within 30 days is returned to the customer at Meridian's cost, unrepaired.
+Turnaround is typically 10 business days from receipt at the service center, as stated in the Warranty Policy, and extends to 20 to 30 business days between May 1 and August 31, which is the shop's busy season. Return shipping is free on all completed repairs.
+
+Quotes are held for 30 days. An item whose quote is declined, or not approved within 30 days, is shipped back for the flat $9.95 fee stated in the Warranty Policy.
 
 ## Abandoned Items
 

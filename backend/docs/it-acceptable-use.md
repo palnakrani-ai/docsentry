@@ -12,7 +12,7 @@ Personal devices are in scope only for the Meridian data on them. Meridian does 
 
 Every employee has one named account. Shared accounts are prohibited except for four documented service accounts in the distribution center, each with a named owner and a quarterly access review.
 
-Multi-factor authentication is required on all accounts. Hardware keys are issued to anyone with administrative access, to finance, and to anyone handling customer payment data. SMS is not an accepted second factor for those roles, because SIM swap attacks defeat it.
+Multi-factor authentication is required on all accounts. The Information Security Policy permits an authenticator app or hardware key, with SMS as a backup method only. This policy narrows that for privileged roles: hardware keys are issued to anyone with administrative access, to finance, and to anyone handling customer payment data, and SMS is not available even as a backup for those roles, because SIM swap attacks defeat it.
 
 Passwords must be unique to Meridian and not reused from any personal account. Meridian provides a password manager and expects it to be used. Password rotation on a fixed schedule is not required, which reflects current guidance that forced rotation produces weaker passwords rather than stronger ones.
 

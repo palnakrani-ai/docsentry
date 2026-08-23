@@ -31,7 +31,7 @@ Tier is calculated on merchandise spend over a rolling 12 months, not on points 
 
 - Base: $0 to $499. Standard earning.
 - Ridge: $500 to $1,499. 1.25x earning, free standard shipping with no order minimum, and a 30-day price adjustment window instead of 14.
-- Summit: $1,500 and above. 1.5x earning, free expedited shipping, a 30-day price adjustment window, early access to member events, and one free repair per year under the Product Care and Repair policy.
+- Alpine: $1,500 and above. 1.5x earning, free expedited shipping, a 30-day price adjustment window, early access to member events, and one free repair per year under the Product Care and Repair policy.
 
 Tier is evaluated on the first of each month. A member who qualifies for a higher tier is upgraded immediately. A member who falls below a threshold retains the higher tier until the next annual anniversary of reaching it, so a single slow year does not cost the benefit mid-year.
 

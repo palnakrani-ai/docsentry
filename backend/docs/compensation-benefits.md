@@ -14,9 +14,9 @@ Pay statements are available in Workday within 24 hours of release and are retai
 
 Every role sits in a pay band with a published minimum, midpoint, and maximum. Bands are reviewed annually against market survey data in September, and any band change takes effect January 1.
 
-Individual pay is reviewed once a year in the January cycle. Out-of-cycle increases are permitted for promotion, for a material change in scope, or to correct a pay equity finding, and require director approval.
+Individual pay is reviewed in the December cycle, with merit increases taking effect January 1, matching the review calendar in the Employee Handbook. Out-of-cycle increases are permitted for promotion, for a material change in scope, or to correct a pay equity finding, and require director approval.
 
-Meridian runs a pay equity analysis annually before the January cycle. Where the analysis identifies an unexplained gap, the correction is applied in that cycle and is not offset against the employee's merit increase.
+Meridian runs a pay equity analysis annually before the December cycle. Where the analysis identifies an unexplained gap, the correction is applied in that cycle and is not offset against the employee's merit increase.
 
 ## Bonus
 
@@ -44,13 +44,13 @@ Employees are automatically enrolled at 3% after 30 days and may opt out at any 
 
 ## Employee Discount
 
-Employees receive 40% off Meridian-branded merchandise and 25% off carried brands, subject to vendor restrictions. Some vendors prohibit discounting entirely and those items are marked in the point-of-sale system.
+Rates and the annual limit are stated in the Employee Handbook: 40% on Meridian-branded products, 20% on third-party brands, up to $2,500 in total discounted purchases per calendar year. This document does not restate them and the Handbook is authoritative if the two ever diverge.
+
+Some vendors prohibit discounting entirely and those items are marked in the point-of-sale system, so the third-party rate does not apply to every carried brand.
 
 The discount does not stack with promotional discounts. Checkout applies whichever is better for the employee automatically, as described in the Price Match and Promotions Policy.
 
-The discount is for the employee and members of their household. It is not for friends, and it is not for resale. Reselling discounted merchandise is theft under the Code of Conduct and has resulted in termination.
-
-Annual discount purchases above $5,000 at the discounted price are reported to payroll, because the discount above a threshold may be taxable income. Employees are notified before any imputed income is applied.
+Employees approaching the $2,500 annual limit receive a notification at 80% of the cap. Purchases above the cap are charged at full price rather than being blocked.
 
 ## Separation
 

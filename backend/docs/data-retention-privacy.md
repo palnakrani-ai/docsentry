@@ -12,14 +12,14 @@ Where a retention period and a legal hold conflict, the legal hold wins and the 
 
 | Category | Retention | Purpose |
 |---|---|---|
-| Order and transaction records | 7 years from order date | Tax, accounting, and warranty claims |
+| Order and transaction records | 5 years after the last transaction, then anonymized | Tax, accounting, and warranty claims |
 | Payment card data | Not stored | Tokenized at the processor |
 | Account profile and addresses | Until account closure plus 90 days | Service delivery |
 | Support conversations | 3 years from last message | Service quality and dispute resolution |
 | Website analytics, identified | 14 months | Product and merchandising decisions |
 | Website analytics, aggregated | Indefinite | Trend analysis, carries no identifier |
 | Marketing consent records | 5 years after consent is withdrawn | Proof that consent existed |
-| Returns and warranty assessments | 7 years | Matches the warranty term |
+| Returns and warranty assessments | 5 years after the last transaction | Outlives the 5-year Summit Series warranty |
 | CCTV at retail and distribution | 30 days | Safety and loss prevention |
 
 Meridian does not store full payment card numbers anywhere in its own systems. Checkout tokenizes at the processor and Meridian stores the token, the last four digits, and the card brand.
@@ -44,7 +44,7 @@ Employees who leave have access revoked at the end of their last working day, pe
 
 Customers may request a copy of their data, correction of inaccurate data, or deletion of their account. Requests go to privacy@meridianoutfitters.example and are fulfilled within 30 calendar days.
 
-Deletion removes the account profile, addresses, marketing preferences, and support history. It does not remove order records, which Meridian is required to retain for 7 years for tax purposes. Customers are told this explicitly rather than being told their data was fully deleted when it was not.
+Deletion removes the account profile, addresses, marketing preferences, and support history. It does not remove order records, which Meridian retains for 5 years after the last transaction for tax purposes before anonymizing them. Customers are told this explicitly rather than being told their data was fully deleted when it was not.
 
 A deletion request does not cancel a pending order or an open warranty claim. Support asks the customer to confirm before proceeding where either is outstanding.
 
