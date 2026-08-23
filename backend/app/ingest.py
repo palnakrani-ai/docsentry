@@ -12,6 +12,7 @@ Idempotent: the collection is dropped and recreated on every run.
 import os
 import re
 import sys
+import time
 from pathlib import Path
 
 from langchain_chroma import Chroma
@@ -30,8 +31,17 @@ COLLECTION_NAME = "docsentry"
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 120
 
+# Gemini's free embedding tier allows 100 requests per minute, and each chunk
+# costs one request. 50 chunks per batch with a 40 second cooldown holds the
+# rate at roughly 75 per minute, leaving headroom for a retry inside the window.
+EMBED_BATCH_SIZE = 50
+EMBED_COOLDOWN_SECONDS = 40
+EMBED_MAX_RETRIES = 5
+
 PRIMARY_EMBED_MODEL = os.environ.get("GEMINI_EMBED_MODEL", "gemini-embedding-001")
-FALLBACK_EMBED_MODEL = "text-embedding-004"
+# text-embedding-004 was retired and now 404s, which made the fallback path a
+# dead end: a 404 on the primary model fell through to another 404.
+FALLBACK_EMBED_MODEL = "gemini-embedding-2"
 
 
 def _api_key() -> str:
@@ -129,15 +139,64 @@ def build_chunks() -> tuple[list[str], list[Document]]:
     return ids, documents
 
 
+def _is_rate_limited(exc: Exception) -> bool:
+    """True when Gemini rejected the call for exceeding a quota (429)."""
+    if getattr(exc, "code", None) == 429:
+        return True
+    text = str(exc).lower()
+    return "429" in text or "resource_exhausted" in text or "quota" in text
+
+
+def _retry_after(exc: Exception) -> int:
+    """Seconds Gemini asked us to wait, from its retry_delay field."""
+    match = re.search(r"retry_delay\s*{\s*seconds:\s*(\d+)", str(exc))
+    return int(match.group(1)) if match else EMBED_COOLDOWN_SECONDS
+
+
+def _embed_batch(store: Chroma, batch: list[Document], batch_ids: list[str]) -> None:
+    """Add one batch, retrying on quota errors with the delay Gemini asks for."""
+    for attempt in range(1, EMBED_MAX_RETRIES + 1):
+        try:
+            store.add_documents(documents=batch, ids=batch_ids)
+            return
+        except Exception as exc:
+            if not _is_rate_limited(exc) or attempt == EMBED_MAX_RETRIES:
+                raise
+            wait = _retry_after(exc) + 5
+            print(
+                f"[ingest] rate limited, waiting {wait}s "
+                f"(attempt {attempt}/{EMBED_MAX_RETRIES - 1})",
+                file=sys.stderr,
+            )
+            time.sleep(wait)
+
+
 def _write_index(ids: list[str], documents: list[Document], model: str) -> Chroma:
-    return Chroma.from_documents(
-        documents=documents,
-        ids=ids,
-        embedding=build_embeddings(model),
+    """Embed and write in paced batches.
+
+    The free embedding tier allows 100 requests per minute and each chunk is
+    one request, so a corpus of any size fails if written in a single call.
+    Batches are written at a rate that stays under the limit, and a batch that
+    is rate limited anyway waits for the delay Gemini names and retries.
+    """
+    store = Chroma(
         collection_name=COLLECTION_NAME,
         persist_directory=str(CHROMA_DIR),
+        embedding_function=build_embeddings(model),
         collection_metadata={"hnsw:space": "cosine", "embed_model": model},
     )
+
+    total = len(documents)
+    for start in range(0, total, EMBED_BATCH_SIZE):
+        batch = documents[start : start + EMBED_BATCH_SIZE]
+        batch_ids = ids[start : start + EMBED_BATCH_SIZE]
+        _embed_batch(store, batch, batch_ids)
+        done = start + len(batch)
+        print(f"[ingest] embedded {done}/{total}")
+        if done < total:
+            time.sleep(EMBED_COOLDOWN_SECONDS)
+
+    return store
 
 
 def main() -> None:

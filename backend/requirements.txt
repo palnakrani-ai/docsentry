@@ -16,3 +16,11 @@ langsmith>=0.3.0
 
 chromadb>=1.0,<2.0
 google-genai>=1.0,<2.0
+
+# Evaluation only. Not imported by the application at runtime; tests/eval uses
+# them. ragas is pinned below langchain-community 0.4 because ragas still
+# imports langchain_community.chat_models.vertexai, which 0.4 removed.
+ragas>=0.4,<0.5
+deepeval>=3.9,<4.0
+langchain-community>=0.3.31,<0.4
+datasets>=4.0

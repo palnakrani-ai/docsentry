@@ -1,0 +1,2708 @@
+{
+ "q001": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q002": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q003": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q004": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q005": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q006": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q007": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q008": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q009": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q010": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q011": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q012": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q013": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q014": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q015": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q016": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q017": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q018": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q019": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q020": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q021": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q022": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q023": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q024": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q025": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q026": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q027": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q028": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q029": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q030": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q031": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q032": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q033": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q034": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q035": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q036": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q037": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q038": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q039": {
+  "naive": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q040": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q041": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q042": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q043": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q044": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q045": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q046": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q047": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q048": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q049": {
+  "naive": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q050": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q062": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q063": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q064": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q065": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q066": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q067": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q068": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q069": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q070": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q071": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  }
+ },
+ "q072": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "hybrid": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q073": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 4
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q074": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q075": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "semantic": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q076": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q077": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q078": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q079": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q080": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q081": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q082": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q083": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q084": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 2
+  }
+ },
+ "q085": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q086": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q087": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q088": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q089": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q090": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q091": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q092": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q093": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q094": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q095": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q096": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q097": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q098": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q099": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q100": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q113": {
+  "naive": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q114": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q115": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q116": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q117": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q118": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 2
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q119": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q120": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q121": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q122": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q123": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q124": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q125": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q126": {
+  "naive": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q127": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 3
+  }
+ },
+ "q128": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  }
+ },
+ "q129": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q130": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q131": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  }
+ },
+ "q132": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  },
+  "semantic": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "hybrid": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q133": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q134": {
+  "naive": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q135": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q136": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  }
+ },
+ "q137": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q138": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q139": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 2
+  },
+  "reranked": {
+   "recall": 0.5,
+   "precision": 0.2,
+   "first_hit_rank": 4
+  }
+ },
+ "q140": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "reranked": {
+   "recall": 0.0,
+   "precision": 0.0,
+   "first_hit_rank": null
+  }
+ },
+ "q141": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  }
+ },
+ "q142": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q143": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 3
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q144": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 5
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q145": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ },
+ "q146": {
+  "naive": {
+   "recall": 1.0,
+   "precision": 0.4,
+   "first_hit_rank": 1
+  },
+  "semantic": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "hybrid": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  },
+  "reranked": {
+   "recall": 1.0,
+   "precision": 0.2,
+   "first_hit_rank": 1
+  }
+ }
+}

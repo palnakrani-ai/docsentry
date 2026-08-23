@@ -6,3 +6,11 @@ frontend/dist/
 .env
 __pycache__/
 *.pyc
+
+# Cached embedding vectors for the evaluation. Content-addressed and
+# regenerable; committing them would add megabytes of derived data.
+backend/tests/eval/.embedding_cache/
+
+# DeepEval's local telemetry and cache directory.
+backend/.deepeval/
+.deepeval*
