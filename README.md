@@ -37,7 +37,7 @@ python -m tests.eval.run_trace_report       # latency, tokens, cost
 ```
 
 **Dataset.** 150 hand-labelled questions over a 25-document, 235-chunk corpus:
-83 factual, 24 multi-hop, 16 ambiguous, and 27 unanswerable. Labels cite exact
+84 factual, 24 multi-hop, 16 ambiguous, and 26 unanswerable. Labels cite exact
 sentences rather than chunk ids, so the same set scores every chunking strategy.
 `validate_dataset.py` runs before any metric and fails if a cited sentence has
 drifted out of the corpus.

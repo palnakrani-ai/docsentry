@@ -231,3 +231,41 @@ have to be serialised.
 and prints the sample size, so an implausible figure is visible rather than
 buried. The real protection is knowing the constraint, which is why it is
 written down here rather than left as folklore.
+
+---
+
+## 12. One label asserted an absence without the document having been read
+
+**What happened.** `q109` asked "Is there a warranty on a repair the service centre
+performs?" and was labelled unanswerable, with a ground truth reading "the
+documentation covers product warranties and repair pricing but does not state
+whether repair work itself is warranted."
+
+`warranty.md` has a section headed **Warranty on Repaired and Replaced Items**
+stating that repairs are guaranteed for 90 days or the remainder of the original
+warranty period, whichever is longer. The label was simply wrong. It was written
+after reading parts of the document rather than all of it, and it asserted an
+absence on that basis.
+
+**Why it matters more than one row in 150.** A wrong answerable label costs a
+little accuracy. A wrong *unanswerable* label is worse: it instructs the
+evaluation to treat a correct, grounded, well-cited answer as a hallucination.
+It would have pushed the refusal metric in the direction that flatters the
+system, by rewarding a refusal that should have been an answer.
+
+**How it was caught.** L4 VERIFY, by a checker reading the corpus. No test caught
+it, and no test could have. `validate_dataset.py` checks that anchors exist; it
+cannot check that a claimed absence is real, because there is nothing to point at.
+
+**What changed.** `q109` is now a factual answerable label with the correct
+anchor. The remaining 26 unanswerable labels were then audited against the corpus
+by searching for each question's subject matter, and all 26 hold: the corpus
+genuinely never states a CEO, revenue, headcount, store list, phone number, pay
+figures, or the names of the eight price-match retailers. `q103` was checked
+specifically because "Front Range Gear Library" does appear twice, and both
+mentions name it as a donation recipient without ever explaining what it is,
+which is what its label says.
+
+**The rule this leaves behind.** An unanswerable label is a claim about the whole
+corpus, not about one passage. Writing one means searching for the subject before
+asserting it is absent, and the audit is cheap: one grep per label.
