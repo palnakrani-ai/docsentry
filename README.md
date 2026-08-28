@@ -57,15 +57,20 @@ recall (0.943 against 0.935) and mainly improves *ranking* (MRR 0.890 against
 retrieval and lexical reranking both made things worse on this corpus. They are
 reported because they were tried, not omitted because they lost.
 
-**Generation quality** (LLM-judged, sampled): RAGAS faithfulness 1.000, answer
-relevancy 0.844, DeepEval hallucination 0.000. Faithfulness is judged against the
-full retrieved context rather than the truncated citation snippets, which is the
-difference between a real measurement and one that scored 0.129 on the same
-answers.
+**Generation quality** (LLM-judged, sampled at n=5 with a fixed seed): RAGAS
+faithfulness 0.975, answer relevancy 0.844, DeepEval hallucination 0.000. These
+move a little run to run because they are judged by a model on a sample; the
+gates sit below them rather than at them for that reason. Faithfulness is judged
+against the full retrieved context rather than the truncated citation snippets,
+which is the difference between a real measurement and one that scored 0.129 on
+the same answers.
 
 **Refusal.** Refusal recall 0.833 with an over-refusal rate of 0.167. The two are
 gated asymmetrically: answering an unanswerable question invents policy someone
-may act on, while refusing an answerable one is merely unhelpful.
+may act on, while refusing an answerable one is merely unhelpful. A refusal caused
+by the generation call failing carries a `model_unavailable` flag and is excluded,
+because scoring an outage as a correct refusal would report a broken run as
+perfect behaviour.
 
 **Prompt injection.** A 50-prompt suite across 15 techniques. The pattern screener
 that runs before any model call flags 38 of the 43 injection prompts (88.4%), up
@@ -74,10 +79,11 @@ rather than injecting an instruction, and are handled by grounding instead; a te
 asserts the screener flags none of them, because a screener broad enough to catch
 those would fire on ordinary questions.
 
-**Cost and latency.** p50 1,495 ms and p95 1,762 ms end to end, about 841 tokens
-per request, roughly $0.10 per 1,000 requests on gemini-flash-lite. Latency is
+**Cost and latency.** p50 2,073 ms and p95 2,361 ms end to end, about 860 tokens
+per request, roughly $0.11 per 1,000 requests on gemini-flash-lite. Latency is
 measured locally because what matters is wall-clock time for the whole request,
-including retrieval and the grounding checks.
+including retrieval and the grounding checks. Run the command with nothing else
+calling the API: a contended run reports contention, not the system.
 
 `DECISIONS.md` records why each of these choices was made and what it costs.
 
