@@ -1,0 +1,32 @@
+# The events table, read-only.
+#
+# Grafana provisioning cannot parse a SQLAlchemy URL, so the connection is given
+# in parts rather than reusing DATABASE_URL. They come from the environment in
+# docker-compose.yml; nothing here is a literal.
+#
+# Point this at a read-only database role in anything that matters. Grafana runs
+# arbitrary SQL from dashboards, and this database holds the audit trail.
+
+apiVersion: 1
+
+datasources:
+  - name: DocSentry
+    type: postgres
+    uid: docsentry-events
+    access: proxy
+    url: ${DS_DB_HOST}:${DS_DB_PORT}
+    database: ${DS_DB_NAME}
+    user: ${DS_DB_USER}
+    secureJsonData:
+      password: ${DS_DB_PASSWORD}
+    jsonData:
+      # Supabase requires TLS. "require" rather than "verify-full" because the
+      # pooler hostname does not match the certificate's subject.
+      sslmode: ${DS_DB_SSLMODE}
+      postgresVersion: 1500
+      timescaledb: false
+      maxOpenConns: 3
+      maxIdleConns: 1
+      connMaxLifetime: 14400
+    isDefault: true
+    editable: false

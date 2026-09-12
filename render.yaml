@@ -1,11 +1,40 @@
+# Render deployment of the API only.
+#
+# This is the reduced form of docker-compose.yml: one web service, no worker, no
+# Beat, no Redis, no Caddy. Render terminates TLS itself and the free tier has
+# nowhere to run background containers, so the index cannot be rebuilt from
+# here. It does not need to be: the index lives in Supabase and is built by the
+# reindex task run anywhere that can reach the database.
+#
+# The image no longer builds an index at build time, so DATABASE_URL is now
+# required. Without it the app falls back to a localhost connection that does
+# not exist inside a Render container, and health reports "index: not built".
+#
+# Set the values in the Render dashboard (Environment tab). They are marked
+# sync:false so they are never committed.
 services:
   - type: web
     name: docsentry
     runtime: docker
     plan: free
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
     envVars:
       - key: GEMINI_API_KEY
         sync: false
+      # Supabase session pooler, with the postgresql+psycopg:// scheme. The
+      # direct db.<ref>.supabase.co host is IPv6-only and unreachable from here.
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_EMBED_MODEL
+        value: gemini-embedding-2
+      # Render is the only thing in front of this service and it sets
+      # X-Forwarded-For, so per-IP rate limiting can trust it here.
+      - key: TRUST_PROXY_HEADERS
+        value: "true"
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_ENVIRONMENT
+        value: render
       - key: PORT
         value: "7860"

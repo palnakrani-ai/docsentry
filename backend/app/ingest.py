@@ -1,9 +1,14 @@
-"""Ingest docs/*.md into a persistent Chroma index via LangChain.
+"""Ingest docs/*.md into a Postgres pgvector index via LangChain.
 
 Splits each markdown file per "## " section, then recursively into ~800-char
 chunks with overlap, embeds with Gemini through LangChain's embedding
-interface, and stores everything in a Chroma collection with
+interface, and stores everything in a pgvector collection with
 {source, section, title} metadata.
+
+The index used to be a Chroma directory baked into the Docker image at build
+time. It lives in Postgres now so that rebuilding it is a job rather than a
+redeploy, and so the api and any worker read the same copy instead of each
+caching their own (see INFRA-MIGRATION.md).
 
 Runnable standalone:  python -m app.ingest
 Idempotent: the collection is dropped and recreated on every run.
@@ -15,18 +20,20 @@ import sys
 import time
 from pathlib import Path
 
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from langchain_postgres import PGVector
+from langchain_postgres.vectorstores import DistanceStrategy
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+from .db import COLLECTION_NAME, collection_stats, database_url
 
 # Paths resolve relative to this package so they work both locally
 # (backend/ as cwd) and inside the Docker image (/app).
 BASE_DIR = Path(__file__).resolve().parent.parent
 DOCS_DIR = BASE_DIR / "docs"
-CHROMA_DIR = BASE_DIR / "chroma_index"
 
-COLLECTION_NAME = "docsentry"
+__all__ = ["COLLECTION_NAME", "build_embeddings", "build_chunks", "main"]
 
 CHUNK_SIZE = 800
 CHUNK_OVERLAP = 120
@@ -153,7 +160,7 @@ def _retry_after(exc: Exception) -> int:
     return int(match.group(1)) if match else EMBED_COOLDOWN_SECONDS
 
 
-def _embed_batch(store: Chroma, batch: list[Document], batch_ids: list[str]) -> None:
+def _embed_batch(store: PGVector, batch: list[Document], batch_ids: list[str]) -> None:
     """Add one batch, retrying on quota errors with the delay Gemini asks for."""
     for attempt in range(1, EMBED_MAX_RETRIES + 1):
         try:
@@ -171,7 +178,7 @@ def _embed_batch(store: Chroma, batch: list[Document], batch_ids: list[str]) -> 
             time.sleep(wait)
 
 
-def _write_index(ids: list[str], documents: list[Document], model: str) -> Chroma:
+def _write_index(ids: list[str], documents: list[Document], model: str) -> PGVector:
     """Embed and write in paced batches.
 
     The free embedding tier allows 100 requests per minute and each chunk is
@@ -179,11 +186,21 @@ def _write_index(ids: list[str], documents: list[Document], model: str) -> Chrom
     Batches are written at a rate that stays under the limit, and a batch that
     is rate limited anyway waits for the delay Gemini names and retries.
     """
-    store = Chroma(
+    # Cosine is stated rather than left to the default, because the grounding
+    # threshold is a cosine relevance score and a silent change of distance
+    # strategy would change what that number means without failing anything.
+    #
+    # pre_delete_collection makes a re-run idempotent and guarantees every
+    # vector in the collection came from one embedding model, which matters on
+    # the fallback path below where the first attempt may have written some.
+    store = PGVector(
         collection_name=COLLECTION_NAME,
-        persist_directory=str(CHROMA_DIR),
-        embedding_function=build_embeddings(model),
-        collection_metadata={"hnsw:space": "cosine", "embed_model": model},
+        connection=database_url(),
+        embeddings=build_embeddings(model),
+        distance_strategy=DistanceStrategy.COSINE,
+        collection_metadata={"embed_model": model},
+        pre_delete_collection=True,
+        use_jsonb=True,
     )
 
     total = len(documents)
@@ -204,16 +221,9 @@ def main() -> None:
     n_docs = len({d.metadata["source"] for d in documents})
     print(f"[ingest] {n_docs} documents -> {len(documents)} chunks")
 
-    # Drop the old collection so re-running is idempotent and every vector in
-    # the index comes from a single embedding model.
-    try:
-        Chroma(
-            collection_name=COLLECTION_NAME,
-            persist_directory=str(CHROMA_DIR),
-        ).delete_collection()
-    except Exception:
-        pass  # first run, nothing to delete
-
+    # The old collection is dropped by pre_delete_collection inside
+    # _write_index rather than here, so the fallback retry below gets the same
+    # clean slate as the first attempt.
     model = PRIMARY_EMBED_MODEL
     try:
         store = _write_index(ids, documents, model)
@@ -229,8 +239,11 @@ def main() -> None:
         store = _write_index(ids, documents, model)
 
     print(f"[ingest] embedded with {model}")
-    written = len(store.get(include=[])["ids"])
-    print(f"[ingest] wrote {written} chunks to {CHROMA_DIR}")
+    # Counted by querying the database rather than the store object, so the
+    # number reported is what a reader would find, not what this process
+    # believes it wrote.
+    sources, written = collection_stats()
+    print(f"[ingest] wrote {written} chunks from {sources} documents to Postgres")
 
 
 if __name__ == "__main__":

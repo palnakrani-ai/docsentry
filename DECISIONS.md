@@ -269,3 +269,113 @@ which is what its label says.
 **The rule this leaves behind.** An unanswerable label is a claim about the whole
 corpus, not about one passage. Writing one means searching for the subject before
 asserting it is absent, and the audit is cheap: one grep per label.
+
+## 13. The vector store moved to Postgres, and the grounding threshold was verified rather than re-tuned
+
+The index was a Chroma directory baked into the Docker image at build time, and
+`rag.py` cached the store as a module-level singleton for the life of the
+process. That is safe only while the index cannot change underneath it. Making
+the index rebuildable without a redeploy breaks it: a worker writes a new index,
+the api keeps answering from the copy it loaded at startup, and nothing errors.
+Stale answers with a clean health check is the failure mode this project already
+learned to be afraid of in LeadTriage.
+
+Postgres with pgvector removes the local copy instead of trying to keep two in
+sync, and it puts the vectors in the same database as the new `events` audit
+trail, so refusal rate and the retrieval scores behind it can be read together.
+
+**Cost:** a network hop per query that an in-process store did not have, an
+extension dependency, and a database that has to be running for the app to
+answer at all. The Docker image can no longer build its own index, so the
+deployment has to change with it.
+
+### The threshold was the risk, and it turned out to move by nothing
+
+`GROUNDING_SCORE_THRESHOLD = 0.45` was tuned against Chroma's relevance scores.
+pgvector works in cosine distance, so the same literal number could easily have
+meant something else afterwards, and nothing in the suite asserts the score
+scale, so it could have changed silently.
+
+Measured across all 150 labelled questions with one shared query embedding per
+question, so the store was the only variable:
+
+| | Result |
+|---|---|
+| Maximum absolute difference in top score | 0.000000 |
+| Top-1 source agreement | 150 / 150 |
+| Refuse/answer decisions changed at 0.45 | 0 |
+
+Identical, because both stores use the same embeddings, the same cosine
+distance, and the same `1 - distance` relevance formula, and at 235 chunks
+Chroma's approximate index is effectively exact. The threshold is unchanged, and
+that is now a measurement rather than an assumption.
+
+### The first version of that comparison was wrong in the M2 way
+
+The first run reported that all 150 decisions flipped. The system was fine. The
+measurement was not: `similarity_search_by_vector_with_relevance_scores` in
+langchain-chroma returns cosine **distance** despite its name, its own docstring
+saying "Lower score represents more similarity", and the comparison took `max()`
+across the five hits, which for a distance is the worst match rather than the
+best. Chroma was being scored by a different formula on a different hit than
+pgvector.
+
+Third instance of the same failure in this project, after faithfulness judged
+against citation snippets and the quota outage that looked like a refusal. A
+measurement that runs and returns a plausible number is more dangerous than one
+that crashes. The rule this time: when comparing two implementations, derive both
+columns with the same formula in the same code path, and treat a result where
+*everything* changed as evidence about the ruler before it is evidence about the
+system.
+
+### What the data says that the plan did not
+
+All 26 unanswerable questions score above 0.45 and reach the model, on both
+stores. The threshold is not what catches an unanswerable question. The
+post-generation citation check is. The first live request through the new stack
+showed the same thing: an off-topic question scored 0.562, passed the gate, and
+was refused for having nothing citable, recorded as `ungrounded` rather than
+`off_topic`.
+
+The threshold's job is narrower than it looked: it saves the cost of a model call
+on questions that are nowhere near the corpus. The grounding guarantee comes
+from the citation check behind it.
+
+## 14. Schema changes go through Alembic, and nothing else
+
+The data layer arrived with its schema in a raw SQL file mounted into the local
+Postgres container as init SQL. That worked exactly once. Pointing the project at
+Supabase meant applying the same DDL a second time, by hand, through a different
+tool, and from then on there were two copies of the truth with nothing checking
+that they agreed. Adding a column would have meant remembering both.
+
+Alembic now owns the schema. `backend/alembic/versions/` holds the revisions, the
+init-SQL mount is gone, and a fresh local database is built with
+`alembic upgrade head` rather than by starting a container.
+
+Three details worth keeping:
+
+**The connection string is not in `alembic.ini`.** `env.py` reads it from
+`app.db.database_url`, the same `DATABASE_URL` the application uses, so a
+migration cannot run against a database the app does not talk to. A URL
+duplicated into a config file is a URL that eventually points somewhere else.
+
+**Revisions are written by hand and `target_metadata` is `None`.** There is no
+SQLAlchemy model layer here. The vector tables are created and owned by
+langchain-postgres and the `events` table is written through plain SQL, so
+autogenerate would compare the database against metadata describing neither and
+offer to drop both.
+
+**Both databases were stamped, not migrated.** The local container and the
+Supabase project already had exactly what revision `ff44e962d75b` creates, so
+both were stamped at it. Running it would have tried to build what was already
+there.
+
+**Cost:** a dependency, a directory, and a step before the app runs on a fresh
+database. The alternative was remembering to apply the same DDL twice in two
+different places, which is not a practice so much as a habit waiting to be
+broken.
+
+Verified by building a throwaway database from the revision and reading back the
+table, both indexes, the extension and the RLS flag, then downgrading it to
+empty again. A migration nobody has run forward and backward is a guess.

@@ -37,11 +37,25 @@ The moment ingest becomes a Celery task, it breaks. `rag.py:107` keeps `_store` 
 
 Moving the vectors into Supabase Postgres with pgvector fixes this by removing the local copy altogether. The worker writes embeddings to Postgres, the api reads from Postgres, and there is one source of truth. It also collapses two datastores into one, so a query event and the chunks it retrieved can be joined in the same database that Grafana already reads.
 
-## The 0.45 threshold is the risk in this migration
+## The 0.45 threshold was the risk, and it measured as unchanged
 
-`rag.py` refuses to answer when the best match scores below 0.45, using Chroma's `similarity_search_with_relevance_scores`. That number was tuned against Chroma's scoring. pgvector works in cosine distance on a different scale, so the same literal 0.45 means something else after the swap.
+`rag.py` refuses to answer when the best match scores below 0.45, using Chroma's
+`similarity_search_with_relevance_scores`. That number was tuned against Chroma's
+scoring, pgvector works in cosine distance, and nothing in the suite asserts the
+score scale, so it could have changed meaning without a test failing.
 
-That threshold is the grounding gate. It is the mechanism the whole demo is built on, and it can shift without a single test failing, because nothing in the suite asserts the score scale itself. Re-tune it against the 150-label evaluation set rather than by eye, and treat that as a gating step rather than cleanup afterwards.
+Measured across all 150 labelled questions with one shared query embedding per
+question: maximum absolute difference in top score **0.000000**, top-1 source
+agreement **150/150**, decisions changed at 0.45 **zero**. Both stores use the
+same embeddings, the same cosine distance and the same `1 - distance` formula,
+and at 235 chunks Chroma's approximate index is effectively exact. The threshold
+carries over untouched. Recorded with the failed first attempt at measuring it in
+`DECISIONS.md` section 13.
+
+The same data corrected something this plan assumed. All 26 unanswerable
+questions score above 0.45 and reach the model, on both stores. The threshold is
+not what catches them; the post-generation citation check is. The threshold only
+saves a model call on questions that are nowhere near the corpus.
 
 ## The events write stays off the response path
 
@@ -61,24 +75,84 @@ The one thing to watch is that Supabase pauses free-tier projects after about a 
 
 ## Build order
 
-1. Supabase project, with pgvector enabled and the `events` table created: question, refusal reason, citations, latency_ms, timestamp
-2. Wire `app/main.py` to write an event row per request, through `BackgroundTasks` so the response does not wait on it. No other behaviour change.
-3. Port the vector store from Chroma to pgvector: `app/ingest.py` and `rag.py:107-128`, swapping `Chroma` for `PGVector` from `langchain-postgres`, plus the `requirements.txt` change
-4. Re-tune the 0.45 relevance threshold against the 150-label set and re-run the retrieval metrics. Do not move on until the refusal behaviour matches what it was on Chroma.
-5. Move `app/ingest.py` into a Celery task, callable on demand instead of only at Docker build time. Drop the build-time ingest and the Hugging Face Spaces secret block from the Dockerfile.
-6. Docker Compose: api, worker, beat and redis on one box, pointed at the Supabase project
-7. Hetzner VPS, Cloudflare DNS and Caddy in front, then cut over from Render
-8. Sentry on the FastAPI app
-9. Grafana dashboard reading from `events`: latency over time, refusal rate, injection-flag rate
-10. Re-measure and republish every number, see below
+Steps 1 to 6, 8 and 9 are done and verified by running the whole stack locally.
+Step 7, the Hetzner box and the Cloudflare DNS, needs accounts rather than code,
+and step 10 has to wait for it because the numbers have to be measured on the
+host that will serve them.
+
+1. ~~Postgres with pgvector and the `events` table.~~ Done as a local container.
+   `backend/sql/init/001_schema.sql` is the schema, and it applies to Supabase by
+   hand from the SQL editor when the project exists.
+2. ~~Wire `app/main.py` to write an event row per request, through
+   `BackgroundTasks`.~~ Done. `db.record_event` also swallows its own failures,
+   so a request that was answered correctly cannot fail because the record of it
+   could not be saved.
+3. ~~Port the vector store from Chroma to pgvector.~~ Done. `app/db.py` is new and
+   holds the connection, the audit write, and the collection queries that replace
+   Chroma's `.get()`, which PGVector has no equivalent for.
+4. ~~Re-tune the 0.45 relevance threshold against the 150-label set.~~ Done, and
+   it needed no change. See the section above.
+5. ~~Move `app/ingest.py` into a Celery task.~~ Done. `app/tasks.py` holds
+   `reindex`, Beat runs it weekly as a drift safety net, and the Dockerfile no
+   longer builds an index or needs a build-time API key.
+6. ~~Docker Compose: api, worker, beat and redis on one box.~~ Done, in
+   `docker-compose.yml`. One image runs all three roles so they cannot disagree
+   about chunking or the embedding model.
+7. Hetzner VPS and Cloudflare DNS, then cut over from Render. **Outstanding**,
+   and the only remaining step that needs an account rather than code. Caddy
+   itself is written and tested; point `DOMAIN` at the real hostname. Use a
+   DNS-only record in Cloudflare for the first certificate, because with the
+   proxy on, Cloudflare terminates TLS and the ACME challenge never arrives.
+8. ~~Sentry on the FastAPI app.~~ Done, in `app/observability.py`, inert without
+   a DSN. Request bodies are scrubbed before an event leaves the process,
+   because the body is the user's question.
+9. ~~Grafana reading `events`.~~ Done, provisioned from files in `deploy/grafana`
+   so a dashboard cannot quietly diverge from the repo. Served at `/grafana`
+   behind the same TLS rather than as a second open port.
+10. Re-measure and republish every number, see below. Blocked on step 7.
 
 ## What this invalidates and has to be re-measured
 
 M2's standing promise is that every published number is reproducible by the demo command. This migration changes the retrieval backend and the hosting, so several of them stop being true on the day of the cutover.
 
 - Latency and cost. The README currently reports p50 2,073 ms and p95 2,361 ms end to end at around 860 tokens, and the genesis records carry an earlier clean run at p50 1,495 ms and p95 1,762 ms. Both were measured elsewhere. Re-run `python -m tests.eval.run_trace_report` after cutover and update the README, `EXPLAINED.md` and `tests/eval/results/trace_report.md`.
-- The four-way ablation. Recall and MRR were measured against Chroma. Re-run `python -m tests.eval.run_ablation` and update the table wherever it appears, including `DECISIONS.md`.
+- The four-way ablation does **not** need re-running, which an earlier draft of this document got wrong. `tests/eval/retrievers.py` builds its own chunkings and computes cosine similarity in memory against a disk-backed embedding cache. It never touched Chroma and does not touch pgvector, so the store swap cannot move those numbers.
 - Run these one at a time. They share a Gemini rate limit and a contended run measures the contention rather than the system, which is the whole point of `DECISIONS.md` section 11.
+
+## What was found by running it rather than writing it
+
+Four things only appeared once the stack was actually up, and all four are the
+kind that a diagram does not show.
+
+**Celery Beat could not write its schedule.** A named volume is created
+root-owned and the image runs as uid 10001, so Beat crash-looped on
+`[Errno 13] Permission denied`. The schedule now lives under the app user's home,
+where Docker seeds the new volume from a directory that already has the right
+ownership.
+
+**Caddy refused to start with an empty `ACME_EMAIL`.** The `email` directive with
+no argument is a parse error, which takes the entire reverse proxy down. It is a
+required variable now.
+
+**Grafana at `/grafana` was a redirect loop.** `handle_path` strips the prefix,
+but Grafana runs with `serve_from_sub_path` and expects it, so it redirected to
+the path it had just been given. `handle` instead of `handle_path`.
+
+**The API was dispatching tasks through an unconfigured Celery app.**
+`@shared_task` binds to whatever app is current, and the API process never
+imported `celery_app`, so it got Celery's default with no broker and no result
+backend. The task was declared on the configured app directly, and `include`
+replaced the import-at-the-bottom that made the first arrangement circular. This
+one is the most worth remembering: the task still appeared to dispatch, and the
+failure only surfaced when something asked for a result.
+
+## Still not merged
+
+`render.yaml` is superseded and marked as such: an app deployed from it would
+start with no index and no worker to build one. Merging before the Hetzner box
+exists leaves the live demo pointing at a deployment path that no longer works,
+so the order is Hetzner and Cloudflare first, then merge, then cut over, then
+re-measure.
 
 ## Not urgent
 

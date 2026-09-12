@@ -1,0 +1,43 @@
+# Local Postgres with pgvector, for developing and verifying the data layer
+# before any hosted database is involved.
+#
+#   docker compose -f docker-compose.dev.yml up -d db
+#
+# The port is 5433 rather than 5432 so this never collides with a Postgres
+# already running on the machine. Connection string for backend/.env:
+#
+#   DATABASE_URL=postgresql+psycopg://docsentry:docsentry@localhost:5433/docsentry
+#
+# Swapping this for Supabase later is a change to that one variable. Nothing in
+# the application code knows which of the two it is talking to.
+#
+# The container starts empty. Schema comes from Alembic and nowhere else:
+#
+#   cd backend && alembic upgrade head
+#
+# An init-SQL mount used to do this, which meant the same DDL lived in two
+# places and only one of them ever reached Supabase. One source of truth is the
+# reason to have migrations at all.
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: docsentry-db
+    environment:
+      POSTGRES_USER: docsentry
+      POSTGRES_PASSWORD: docsentry
+      POSTGRES_DB: docsentry
+    ports:
+      - "5433:5432"
+    volumes:
+      - docsentry-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The app should wait for a database that can actually answer, not just
+      # for an open port.
+      test: ["CMD-SHELL", "pg_isready -U docsentry -d docsentry"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  docsentry-pgdata:

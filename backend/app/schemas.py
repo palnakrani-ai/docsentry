@@ -22,9 +22,14 @@ class ChatResponse(BaseModel):
 
 
 class HealthResponse(BaseModel):
+    # "ok" only when every dependency answered and the index has content.
+    # "degraded" when the service can still answer but something it needs is
+    # missing. "error" when it cannot answer at all. A health check that cannot
+    # return anything but "ok" is decoration.
     status: str
     documents: int
     chunks: int
+    checks: dict[str, str] = {}
 
 
 class SourceInfo(BaseModel):
