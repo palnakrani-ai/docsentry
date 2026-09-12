@@ -176,7 +176,7 @@ def health(response: Response) -> HealthResponse:
     try:
         documents, chunks = rag.collection_stats()
         checks["database"] = "ok"
-        checks["index"] = "ok" if chunks > 0 else "empty"
+        checks["index"] = "ok" if chunks > 0 else "not built"
     except Exception as exc:
         checks["database"] = f"error: {type(exc).__name__}"
         checks["index"] = "unknown"
@@ -185,7 +185,7 @@ def health(response: Response) -> HealthResponse:
 
     if checks["database"] != "ok" or checks["index"] == "unknown":
         status = "error"
-    elif checks["index"] == "empty":
+    elif checks["index"] == "not built":
         status = "degraded"
     elif checks["broker"] != "ok":
         status = "degraded"
