@@ -16,13 +16,40 @@ Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-
 
 The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee.
 
+```mermaid
+flowchart LR
+    Q["question"] --> SCR["injection<br/>screener"]
+    SCR --> RET["retrieve top 5<br/>pgvector"]
+    RET --> G1{"score<br/>&ge; 0.45?"}
+    G1 -->|no| REF["REFUSE"]
+    G1 -->|yes| GEN["Gemini<br/>structured JSON"]
+    GEN --> G2{"cited real chunks<br/>and confident?"}
+    G2 -->|no| REF
+    G2 -->|yes| ANS["ANSWER<br/>+ citations"]
+
+    style REF stroke-width:2px
+    style ANS stroke-width:2px
+    style G1 stroke-width:2px
+    style G2 stroke-width:2px
+```
+
+The two diamonds are the product. Everything else is plumbing.
+
 ## Guardrails
 
-1. Input validation: 1 to 500 character questions, control characters stripped.
-2. Injection detection before any LLM call: ignore-instructions phrasing, system prompt fishing, role-play requests, raw document exfiltration, jailbreak phrasings. Flagged questions are still answered from the docs only and the instructions are never obeyed.
-3. The question is wrapped in `<user_question>` tags and the system prompt declares it untrusted data.
-4. Grounding enforced in code: the model must return structured JSON with cited chunk ids and a confidence bit. No citations, low confidence, or weak retrieval scores all produce a refusal with `refused: true`. The bot never answers from general knowledge.
-5. In-memory rate limiting, 20 requests per minute per IP.
+| # | Layer | Where it runs | On failure |
+|---|---|---|---|
+| 1 | Input validation, 1 to 500 chars, control chars stripped | before anything | `400` |
+| 2 | Injection screener: ignore-instructions phrasing, prompt fishing, role-play, exfiltration, jailbreaks | **before any LLM call** | flag and continue |
+| 3 | `<user_question>` delimiters, declared untrusted in the system prompt | in the prompt | defence in depth only |
+| 4 | Retrieval score threshold | after retrieval | refuse, **no model call** |
+| 5 | Citation verification against chunks actually retrieved | after generation | refuse |
+| 6 | Rate limit, 20/min per IP | per request | `429` |
+
+Only layer 3 lives inside the prompt, and it is not load-bearing. Layers 4 and 5
+are the ones that decide whether an answer ships, and both are plain Python. A
+flagged question is still answered from the documents; the instruction inside it
+is never obeyed.
 
 ## Evaluation
 
