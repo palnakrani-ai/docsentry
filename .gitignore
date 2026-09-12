@@ -14,3 +14,9 @@ backend/tests/eval/.embedding_cache/
 # DeepEval's local telemetry and cache directory.
 backend/.deepeval/
 .deepeval*
+
+# Interview preparation and internal migration planning. Kept locally, not
+# published: EXPLAINED.md is a script for talking about this work, and a public
+# copy tells an interviewer exactly what is coming.
+EXPLAINED.md
+INFRA-MIGRATION.md

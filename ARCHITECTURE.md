@@ -243,4 +243,4 @@ Measured: the screener catches **88.4%** of a 50-prompt injection suite. The rem
 | `SENTRY_DSN` | no | inert when unset; request bodies are scrubbed because the body is the user's question |
 | `LANGSMITH_*` | no | tracing off unless all three set |
 
-See `DECISIONS.md` for why each of these is the way it is, and `INFRA-MIGRATION.md` for what moved and what is still outstanding.
+See `DECISIONS.md` for why each of these is the way it is, and what each choice cost.

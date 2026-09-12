@@ -2,7 +2,7 @@
 
 A RAG document Q&A demo with guardrails. It answers questions about a fictional outdoor gear retailer, Meridian Outfitters, strictly from the company's handbook and policy documents. Every answer carries citations, anything outside the docs gets a polite refusal, and prompt injection attempts are flagged and ignored. Ships as a Docker image, deployable as a single API service or as the full stack with a worker, scheduler, TLS and dashboards.
 
-Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-postgres`), Postgres with pgvector holding both the index and a per-request audit trail, Celery and Redis for index rebuilds, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional Sentry and LangSmith. The index used to be a Chroma directory baked into the image at build time; `INFRA-MIGRATION.md` records why that had to change.
+Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-postgres`), Postgres with pgvector holding both the index and a per-request audit trail, Celery and Redis for index rebuilds, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional Sentry and LangSmith. The index used to be a Chroma directory baked into the image at build time; `DECISIONS.md` records why that had to change.
 
 The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee. Those two checks are drawn out under [How an answer is decided](#how-an-answer-is-decided).
 
@@ -95,7 +95,7 @@ calling the API: a contended run reports contention, not the system.
 > temporary arrangement nobody intends to keep. Regenerate them on the host that
 > will actually serve traffic, with
 > `python -m tests.eval.run_trace_report --limit 12`, and delete this note. See
-> `INFRA-MIGRATION.md` and `DECISIONS.md` section 13.
+> `DECISIONS.md` sections 13 and 15.
 
 `DECISIONS.md` records why each of these choices was made and what it costs.
 
