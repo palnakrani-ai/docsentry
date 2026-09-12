@@ -1,3 +1,13 @@
+# SUPERSEDED. Kept only until the cutover to Hetzner is done, so the live demo
+# has something to fall back to.
+#
+# This no longer works with the current Dockerfile. The image used to build its
+# own Chroma index at build time; the index now lives in Postgres and is built
+# by the reindex Celery task, so an app deployed from this file would start with
+# no index and no worker to fill one. Deploy with docker-compose.yml instead.
+#
+# See INFRA-MIGRATION.md.
+
 services:
   - type: web
     name: docsentry

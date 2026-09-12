@@ -1,0 +1,18 @@
+# Dashboards are files in the repo, not objects edited in the UI and lost with
+# the container. editable: false so a change made in the browser cannot quietly
+# diverge from what is committed.
+
+apiVersion: 1
+
+providers:
+  - name: docsentry
+    orgId: 1
+    folder: DocSentry
+    type: file
+    disableDeletion: false
+    editable: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

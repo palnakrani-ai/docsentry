@@ -1,0 +1,182 @@
+{
+  "uid": "docsentry-overview",
+  "title": "DocSentry",
+  "tags": ["docsentry"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Requests",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at)"
+        }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } }
+    },
+    {
+      "type": "stat",
+      "title": "Refusal rate",
+      "description": "Share of requests that refused. High is not automatically bad: refusing an unanswerable question is the product working. A sudden move in either direction is the signal.",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COALESCE(AVG(CASE WHEN answered THEN 0 ELSE 1 END), 0) AS value FROM events WHERE $__timeFilter(created_at)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.4 },
+              { "color": "red", "value": 0.7 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } }
+    },
+    {
+      "type": "stat",
+      "title": "Model unavailable",
+      "description": "Refusals caused by the model failing rather than by a grounding decision. This is the one that means the system is broken, and telling it apart from a correct refusal was the hardest bug of M2. Anything above zero wants looking at.",
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND refusal_reason = 'model_unavailable'"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } }
+    },
+    {
+      "type": "stat",
+      "title": "p95 latency",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COALESCE(PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms), 0) AS value FROM events WHERE $__timeFilter(created_at)"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } }
+    },
+    {
+      "type": "stat",
+      "title": "Injection flagged",
+      "description": "Requests the pre-model screener flagged. The screener catches 88.4% of the 50-prompt suite; grounding stops the rest.",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND cardinality(flags) > 0"
+        }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency over time",
+      "description": "p50 and p95 in five minute buckets.",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(created_at, '5m'), PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY latency_ms) AS \"p50\", PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY latency_ms) AS \"p95\" FROM events WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms", "custom": { "lineWidth": 2, "fillOpacity": 8 } }, "overrides": [] }
+    },
+    {
+      "type": "timeseries",
+      "title": "Answered and refused",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "time_series",
+          "rawQuery": true,
+          "rawSql": "SELECT $__timeGroupAlias(created_at, '5m'), COUNT(*) FILTER (WHERE answered) AS \"answered\", COUNT(*) FILTER (WHERE NOT answered) AS \"refused\" FROM events WHERE $__timeFilter(created_at) GROUP BY 1 ORDER BY 1"
+        }
+      ],
+      "fieldConfig": { "defaults": { "custom": { "lineWidth": 2, "fillOpacity": 20, "stacking": { "mode": "normal" } } }, "overrides": [] }
+    },
+    {
+      "type": "piechart",
+      "title": "Why it refused",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 13 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT refusal_reason AS metric, COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND NOT answered GROUP BY refusal_reason ORDER BY value DESC"
+        }
+      ]
+    },
+    {
+      "type": "histogram",
+      "title": "Top retrieval score",
+      "description": "The number the grounding gate compares against its 0.45 threshold. Measured on the labelled set, answerable questions sit around 0.78 and unanswerable around 0.72, which is why the threshold is not what catches an unanswerable question. Watch this for drift against live traffic rather than re-tuning blind.",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 13 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT top_score FROM events WHERE $__timeFilter(created_at) AND top_score IS NOT NULL"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "Slowest requests",
+      "description": "Questions are shown because this dashboard is behind Grafana auth on a private host. Do not export this panel.",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 13 },
+      "datasource": { "type": "postgres", "uid": "docsentry-events" },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT created_at, latency_ms, answered, refusal_reason, round(top_score::numeric, 3) AS top_score, left(question, 80) AS question FROM events WHERE $__timeFilter(created_at) ORDER BY latency_ms DESC LIMIT 20"
+        }
+      ]
+    }
+  ]
+}

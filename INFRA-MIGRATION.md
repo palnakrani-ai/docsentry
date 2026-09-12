@@ -75,9 +75,10 @@ The one thing to watch is that Supabase pauses free-tier projects after about a 
 
 ## Build order
 
-Steps 1 to 4 are done, against the local pgvector container in
-`docker-compose.dev.yml` rather than Supabase, so the port was verified before a
-hosted dependency entered it. Steps 5 onward are M2.6.
+Steps 1 to 6, 8 and 9 are done and verified by running the whole stack locally.
+Step 7, the Hetzner box and the Cloudflare DNS, needs accounts rather than code,
+and step 10 has to wait for it because the numbers have to be measured on the
+host that will serve them.
 
 1. ~~Postgres with pgvector and the `events` table.~~ Done as a local container.
    `backend/sql/init/001_schema.sql` is the schema, and it applies to Supabase by
@@ -91,12 +92,24 @@ hosted dependency entered it. Steps 5 onward are M2.6.
    Chroma's `.get()`, which PGVector has no equivalent for.
 4. ~~Re-tune the 0.45 relevance threshold against the 150-label set.~~ Done, and
    it needed no change. See the section above.
-5. Move `app/ingest.py` into a Celery task, callable on demand instead of only at Docker build time. Drop the build-time ingest and the Hugging Face Spaces secret block from the Dockerfile.
-6. Docker Compose: api, worker, beat and redis on one box, pointed at the Supabase project
-7. Hetzner VPS, Cloudflare DNS and Caddy in front, then cut over from Render
-8. Sentry on the FastAPI app
-9. Grafana dashboard reading from `events`: latency over time, refusal rate, injection-flag rate
-10. Re-measure and republish every number, see below
+5. ~~Move `app/ingest.py` into a Celery task.~~ Done. `app/tasks.py` holds
+   `reindex`, Beat runs it weekly as a drift safety net, and the Dockerfile no
+   longer builds an index or needs a build-time API key.
+6. ~~Docker Compose: api, worker, beat and redis on one box.~~ Done, in
+   `docker-compose.yml`. One image runs all three roles so they cannot disagree
+   about chunking or the embedding model.
+7. Hetzner VPS and Cloudflare DNS, then cut over from Render. **Outstanding**,
+   and the only remaining step that needs an account rather than code. Caddy
+   itself is written and tested; point `DOMAIN` at the real hostname. Use a
+   DNS-only record in Cloudflare for the first certificate, because with the
+   proxy on, Cloudflare terminates TLS and the ACME challenge never arrives.
+8. ~~Sentry on the FastAPI app.~~ Done, in `app/observability.py`, inert without
+   a DSN. Request bodies are scrubbed before an event leaves the process,
+   because the body is the user's question.
+9. ~~Grafana reading `events`.~~ Done, provisioned from files in `deploy/grafana`
+   so a dashboard cannot quietly diverge from the repo. Served at `/grafana`
+   behind the same TLS rather than as a second open port.
+10. Re-measure and republish every number, see below. Blocked on step 7.
 
 ## What this invalidates and has to be re-measured
 
@@ -106,16 +119,40 @@ M2's standing promise is that every published number is reproducible by the demo
 - The four-way ablation does **not** need re-running, which an earlier draft of this document got wrong. `tests/eval/retrievers.py` builds its own chunkings and computes cosine similarity in memory against a disk-backed embedding cache. It never touched Chroma and does not touch pgvector, so the store swap cannot move those numbers.
 - Run these one at a time. They share a Gemini rate limit and a contended run measures the contention rather than the system, which is the whole point of `DECISIONS.md` section 11.
 
-## The branch is not deployable, deliberately
+## What was found by running it rather than writing it
 
-The image still runs `python -m app.ingest` at build time, and that now needs a
-database, so the Docker build fails on this branch. That is step 5's job to fix
-and it belongs with the Compose work rather than here.
+Four things only appeared once the stack was actually up, and all four are the
+kind that a diagram does not show.
 
-It also means this must not reach `main` while Render is still serving the live
-demo from a baked Chroma index. Merging before a database exists takes the
-flagship demo down. The order is: Supabase project first, then the Dockerfile and
-Compose changes, then merge, then cut over.
+**Celery Beat could not write its schedule.** A named volume is created
+root-owned and the image runs as uid 10001, so Beat crash-looped on
+`[Errno 13] Permission denied`. The schedule now lives under the app user's home,
+where Docker seeds the new volume from a directory that already has the right
+ownership.
+
+**Caddy refused to start with an empty `ACME_EMAIL`.** The `email` directive with
+no argument is a parse error, which takes the entire reverse proxy down. It is a
+required variable now.
+
+**Grafana at `/grafana` was a redirect loop.** `handle_path` strips the prefix,
+but Grafana runs with `serve_from_sub_path` and expects it, so it redirected to
+the path it had just been given. `handle` instead of `handle_path`.
+
+**The API was dispatching tasks through an unconfigured Celery app.**
+`@shared_task` binds to whatever app is current, and the API process never
+imported `celery_app`, so it got Celery's default with no broker and no result
+backend. The task was declared on the configured app directly, and `include`
+replaced the import-at-the-bottom that made the first arrangement circular. This
+one is the most worth remembering: the task still appeared to dispatch, and the
+failure only surfaced when something asked for a result.
+
+## Still not merged
+
+`render.yaml` is superseded and marked as such: an app deployed from it would
+start with no index and no worker to build one. Merging before the Hetzner box
+exists leaves the live demo pointing at a deployment path that no longer works,
+so the order is Hetzner and Cloudflare first, then merge, then cut over, then
+re-measure.
 
 ## Not urgent
 

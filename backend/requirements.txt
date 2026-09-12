@@ -27,6 +27,16 @@ sqlalchemy>=2.0,<3.0
 
 google-genai>=1.0,<2.0
 
+# Background work. Exactly one task, rebuilding the vector index, so that
+# changing a document is a job rather than a redeploy. Beat runs it on a
+# schedule as a drift safety net. See app/celery_app.py for why this is honest
+# about not being a throughput problem.
+celery[redis]>=5.4,<6.0
+redis>=5.0,<7.0
+
+# Error reporting. Completely inert unless SENTRY_DSN is set.
+sentry-sdk[fastapi]>=2.0,<3.0
+
 # Evaluation only. Not imported by the application at runtime; tests/eval uses
 # them. ragas is pinned below langchain-community 0.4 because ragas still
 # imports langchain_community.chat_models.vertexai, which 0.4 removed.

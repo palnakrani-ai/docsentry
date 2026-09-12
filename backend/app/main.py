@@ -6,11 +6,12 @@ from pathlib import Path
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Response
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import db, guardrails, rag
+from . import db, guardrails, observability, rag
 from .ingest import BASE_DIR
 from .schemas import (
     ChatRequest,
@@ -24,6 +25,10 @@ STATIC_DIR = BASE_DIR / "static"
 
 RATE_LIMIT = 20  # requests
 RATE_WINDOW = 60.0  # seconds
+
+# Started before the app object exists so that a failure during startup is
+# itself reportable. Inert without SENTRY_DSN.
+observability.init_sentry()
 
 app = FastAPI(title="DocSentry", version="1.0.0")
 
@@ -137,14 +142,67 @@ def _refusal_reason(result: rag.RagResult, flags: list[str]) -> str | None:
 
 
 @app.get("/api/health", response_model=HealthResponse)
-def health() -> HealthResponse:
+def health(response: Response) -> HealthResponse:
+    """Report whether this service can actually answer a question.
+
+    It used to return "ok" unconditionally, catching the exception from a
+    missing index and reporting zeros. That is the LeadTriage defect written
+    down in this program's own records: a health check that stays green through
+    the outage it exists to catch. A monitor is not verified until it has been
+    tested against a deliberately unhealthy state, so each dependency is named
+    separately and a failure changes both the status and the HTTP code.
+
+    The broker is reported but never fatal. Celery being down stops the index
+    being rebuilt; it does not stop a question being answered.
+    """
+    checks: dict[str, str] = {}
     documents = 0
     chunks = 0
+
     try:
         documents, chunks = rag.collection_stats()
-    except Exception:
-        pass  # index not built yet; report zeros rather than crash
-    return HealthResponse(status="ok", documents=documents, chunks=chunks)
+        checks["database"] = "ok"
+        checks["index"] = "ok" if chunks > 0 else "empty"
+    except Exception as exc:
+        checks["database"] = f"error: {type(exc).__name__}"
+        checks["index"] = "unknown"
+
+    checks["broker"] = _broker_status()
+
+    if checks["database"] != "ok" or checks["index"] == "unknown":
+        status = "error"
+    elif checks["index"] == "empty":
+        status = "degraded"
+    elif checks["broker"] != "ok":
+        status = "degraded"
+    else:
+        status = "ok"
+
+    if status == "error":
+        response.status_code = 503
+
+    return HealthResponse(
+        status=status, documents=documents, chunks=chunks, checks=checks
+    )
+
+
+def _broker_status() -> str:
+    """Whether Redis is reachable, without making it a hard dependency.
+
+    Imported lazily so the API still starts in an environment with no Celery
+    installed at all, which is how the test suite runs.
+    """
+    try:
+        from .celery_app import celery_app
+
+        conn = celery_app.connection()
+        try:
+            conn.ensure_connection(max_retries=0, timeout=2)
+        finally:
+            conn.release()
+        return "ok"
+    except Exception as exc:
+        return f"unavailable: {type(exc).__name__}"
 
 
 @app.get("/api/sources", response_model=SourcesResponse)
