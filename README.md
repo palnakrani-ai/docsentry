@@ -85,6 +85,20 @@ measured locally because what matters is wall-clock time for the whole request,
 including retrieval and the grounding checks. Run the command with nothing else
 calling the API: a contended run reports contention, not the system.
 
+> **These latency figures are stale as of 2026-09-12 and are kept only until they
+> can be honestly replaced.** They were measured when the vector index was a
+> Chroma directory inside the process. The index now lives in Supabase Postgres,
+> so every retrieval crosses a network hop, and the current deployment puts the
+> app and the database on different continents. Observed end to end today: about
+> 5.4 s from a laptop, 8 to 11 s from the Render deployment. The token and cost
+> figures are unaffected, since neither depends on where the index is stored.
+>
+> They are not simply overwritten with today's numbers because those describe a
+> temporary arrangement nobody intends to keep. Regenerate them on the host that
+> will actually serve traffic, with
+> `python -m tests.eval.run_trace_report --limit 12`, and delete this note. See
+> `INFRA-MIGRATION.md` and `DECISIONS.md` section 13.
+
 `DECISIONS.md` records why each of these choices was made and what it costs.
 
 ## API

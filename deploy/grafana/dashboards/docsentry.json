@@ -184,11 +184,11 @@
     },
     {
       "type": "stat",
-      "title": "Injection flagged",
-      "description": "Requests the pre-model screener flagged. The screener catches 88.4% of the 50-prompt suite; grounding stops the rest.",
+      "title": "Injection attempts",
+      "description": "Requests the pre-model screener flagged as prompt injection. Counts the prompt_injection_suspected flag specifically, NOT any flag: flags also carries off_topic and model_unavailable, so cardinality(flags) > 0 would fold ordinary refusals and outages into an attack count. The screener catches 88.4% of the 50-prompt suite; grounding stops the rest.",
       "gridPos": {
         "h": 4,
-        "w": 6,
+        "w": 3,
         "x": 18,
         "y": 0
       },
@@ -200,7 +200,7 @@
         {
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND cardinality(flags) > 0"
+          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND 'prompt_injection_suspected' = ANY(flags)"
         }
       ],
       "options": {
@@ -363,6 +363,37 @@
           "rawSql": "SELECT created_at, latency_ms, answered, refusal_reason, round(top_score::numeric, 3) AS top_score, left(question, 80) AS question FROM events WHERE $__timeFilter(created_at) ORDER BY latency_ms DESC LIMIT 20"
         }
       ]
+    },
+    {
+      "type": "stat",
+      "title": "Off-topic pre-filter",
+      "description": "Requests the grounding gate rejected before calling the model, because nothing in the corpus scored above 0.45. Separated from injections so neither number contaminates the other.",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 0
+      },
+      "datasource": {
+        "type": "postgres",
+        "uid": "docsentry-events"
+      },
+      "targets": [
+        {
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT COUNT(*) AS value FROM events WHERE $__timeFilter(created_at) AND 'off_topic' = ANY(flags)"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
     }
   ]
 }
