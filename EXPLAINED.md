@@ -708,7 +708,7 @@ Name these before an interviewer finds them. Being first converts a gap into sel
 
 ### The 30-second version
 
-> "DocSentry answers questions about a company's documents. The model is only allowed to answer from passages retrieved from those documents, it has to cite which ones it used, and code verifies that before anything reaches the user. If the citations are missing or the retrieval was weak, it refuses instead of guessing. So the model advises, and code decides."
+> "DocSentry answers questions about a company's documents. The model is only allowed to answer from passages retrieved from those documents, it has to cite which ones it used, and code verifies that before anything reaches the user. If the citations are missing or the retrieval was weak, it refuses instead of guessing. The model advises, and code decides. And I measured it rather than assuming: 150 labelled questions, faithfulness and hallucination scored in CI, and a 50-prompt injection suite."
 
 ### The 2-minute version, using the 4-beat frame
 
@@ -718,7 +718,11 @@ Name these before an interviewer finds them. Being first converts a gap into sel
 
 **What I built (45s).** Retrieval-augmented generation with enforced grounding. Documents are split on their markdown headings, then into 800-character chunks with 120 characters of overlap so no sentence gets cut in half. Those are embedded and stored in Chroma. When a question comes in, it's validated, scanned for injection patterns, then embedded and matched against the chunks by cosine similarity. If the best match scores below 0.45, it refuses without calling the model at all, which saves the API call. Otherwise the top 5 chunks go into the prompt and the model must return structured JSON with the answer, which chunk ids it used, and a confidence flag. Then code checks it: no citations, invented citation ids, or low confidence all produce a refusal.
 
-**The result and the limit (20s).** Injection attempts get flagged and can't succeed, because there's nothing in the documents to cite for them. The main gap is that I have no eval harness yet, so the thresholds are hand-tuned rather than measured. That's my next piece of work: a labeled question set with RAGAS scoring in CI, plus a reranker, which is the highest-value retrieval improvement available here.
+**The result and the limit (20s).** It is measured rather than asserted. 150 hand-labelled questions, RAGAS faithfulness 0.975 and DeepEval hallucination 0.000 gated in pytest, and a 50-prompt injection suite where the pre-model screener catches 88.4%. I also ran a four-way retrieval ablation, and the interesting result is negative: hybrid BM25 plus vector, and a reranker on top, both made retrieval worse on this corpus. Section-aware chunking won, mostly on ranking rather than recall. The honest limit is that the reranker I tried is lexical rather than a cross-encoder, so that result is about my reranker and not about reranking in general, and the LLM-judged numbers are sampled so they move a little between runs.
+
+> Why this closing beat matters more than the rest: everyone says they tested it. Almost nobody can name a number, and almost nobody volunteers an experiment that failed. The negative ablation result is the strongest thing in this script, so do not skip it to save time.
+
+*(Superseded 2026-08-28. This beat previously said there was no eval harness and that a labelled set, RAGAS in CI, and a reranker were the next piece of work. All of it shipped between 08-24 and 08-28, and the reranker lost.)*
 
 ### Five details to drop unprompted
 
