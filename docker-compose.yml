@@ -19,6 +19,14 @@ x-app: &app
   env_file: .env
   environment:
     CELERY_BROKER_URL: redis://redis:6379/0
+    # Caddy is the only route to the API: the port is not published, so nothing
+    # can reach the app without passing through the proxy, and Caddy overwrites
+    # X-Forwarded-For on the way. That is what makes the header trustworthy
+    # here, and it is the only condition under which it is. Publish the port
+    # directly, or put something in front that does not set the header, and this
+    # must go back to false: X-Forwarded-For is client-supplied, so trusting it
+    # otherwise lets anyone reset their own rate limit per request.
+    TRUST_PROXY_HEADERS: "true"
   depends_on:
     redis:
       condition: service_healthy

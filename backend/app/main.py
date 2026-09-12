@@ -1,5 +1,6 @@
 """DocSentry FastAPI app: chat, health, sources, static frontend."""
 
+import os
 import time
 from collections import defaultdict, deque
 from pathlib import Path
@@ -48,10 +49,23 @@ app.add_middleware(
 _hits: dict[str, deque[float]] = defaultdict(deque)
 
 
+# X-Forwarded-For is a header the client sends. It can only be believed when
+# something in front of the app overwrites it, and that used to be Caddy with
+# the API port unpublished. With the port published directly, trusting it lets
+# anyone reset their own rate limit by sending a different value each request,
+# so it is now off unless explicitly turned on.
+#
+# Set TRUST_PROXY_HEADERS=true only when a reverse proxy you control is the
+# only route to this app: Cloudflare Tunnel, an nginx or Caddy you run, a load
+# balancer. Never when the port is reachable from the internet directly.
+TRUST_PROXY_HEADERS = os.environ.get("TRUST_PROXY_HEADERS", "").lower() == "true"
+
+
 def _client_ip(request: Request) -> str:
-    forwarded = request.headers.get("x-forwarded-for")
-    if forwarded:
-        return forwarded.split(",")[0].strip()
+    if TRUST_PROXY_HEADERS:
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
 
 
