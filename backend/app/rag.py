@@ -136,6 +136,12 @@ def get_store() -> PGVector:
             embeddings=build_embeddings(embed_model),
             distance_strategy=DistanceStrategy.COSINE,
             use_jsonb=True,
+            # The extension is owned by Alembic (revision ff44e962d75b), not by
+            # the application. Left at its default, PGVector issues CREATE
+            # EXTENSION on every construction, which requires privileges the
+            # runtime role has no business holding. Turning it off is what lets
+            # the app connect as a least-privilege role instead of as postgres.
+            create_extension=False,
         )
     return _store
 

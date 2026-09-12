@@ -379,3 +379,58 @@ broken.
 Verified by building a throwaway database from the revision and reading back the
 table, both indexes, the extension and the RLS flag, then downgrading it to
 empty again. A migration nobody has run forward and backward is a guess.
+
+## 15. The application connects as a least-privilege role, not as the database owner
+
+The app connected as `postgres`. Every request therefore ran with the authority
+to drop the schema, and the only thing standing between a bug and an empty
+database was that no code path happened to do it.
+
+`docsentry_app` now holds exactly what the application does and nothing else:
+read the vectors, rewrite them during a reindex, append to `events`, read the
+collection metadata. It cannot run DDL, cannot read `events` back, and cannot see
+`alembic_version`. Migrations stay with the owner role, which is the right split:
+a runtime that can alter its own schema can also destroy it during an incident.
+
+`events` is append-only to the app deliberately. The app writes audit rows and
+never reads them; Grafana does that through `grafana_ro`. A process that cannot
+rewrite the record of what it did is a meaningfully better audit trail.
+
+**Cost:** a second credential to manage, and the reindex path now depends on
+policies being right rather than on ownership making every question moot.
+
+### Row level security was silently returning zero rows
+
+Supabase enables RLS on public tables by default, including the two
+langchain-postgres creates. Nothing had ever surfaced that, because the owner
+bypasses RLS.
+
+Under the new role the first test read **zero vectors, with no error**. A GRANT
+alone was not enough. Had the connection string been swapped without testing
+reads, retrieval would have returned nothing, every question would have refused,
+and `/api/health` would have reported `index: not built` while 235 chunks sat in
+the table untouched. A permissions problem wearing the costume of an empty index,
+and every symptom would have pointed at the ingest.
+
+The policies in migration `docsentry_app_vector_policies` are what make the
+grants real. This is the same failure shape as the others in this file: the
+system reports something plausible and wrong. It is the first one caught before
+reaching production rather than after, and only because the check asked what the
+role could read rather than whether it could connect.
+
+### One residual, stated rather than hidden
+
+The role can still create *trusted* extensions, despite holding no CREATE on the
+schema or database and despite explicit REVOKEs. Untrusted extensions are
+correctly denied, so the exposure is bounded: trusted extensions cannot execute
+arbitrary code or reach the filesystem. This looks like Supabase platform
+behaviour that grants cannot close. Recorded because an unexplained privilege is
+worth naming, and because the test that found it is worth keeping.
+
+### How it was verified
+
+By connecting as the role and asserting both directions: that all four required
+operations work, and that reading events back, updating or deleting them,
+creating tables, and reading `alembic_version` are each denied. Testing only the
+happy path would have passed a role with far more privilege than intended. Two
+probe rows and one probe extension were created during this and have been removed.

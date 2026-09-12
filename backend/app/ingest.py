@@ -201,6 +201,12 @@ def _write_index(ids: list[str], documents: list[Document], model: str) -> PGVec
         collection_metadata={"embed_model": model},
         pre_delete_collection=True,
         use_jsonb=True,
+        # The extension is owned by Alembic (revision ff44e962d75b), not by
+        # the application. Left at its default, PGVector issues CREATE
+        # EXTENSION on every construction, which requires privileges the
+        # runtime role has no business holding. Turning it off is what lets
+        # the app connect as a least-privilege role instead of as postgres.
+        create_extension=False,
     )
 
     total = len(documents)
