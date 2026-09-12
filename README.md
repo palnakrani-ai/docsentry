@@ -1,13 +1,3 @@
----
-title: DocSentry
-emoji: 🛡️
-colorFrom: green
-colorTo: gray
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # DocSentry
 
 A RAG document Q&A demo with guardrails. It answers questions about a fictional outdoor gear retailer, Meridian Outfitters, strictly from the company's handbook and policy documents. Every answer carries citations, anything outside the docs gets a polite refusal, and prompt injection attempts are flagged and ignored. Ships as a Docker image, deployable as a single API service or as the full stack with a worker, scheduler, TLS and dashboards.
@@ -17,15 +7,15 @@ Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-
 The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee.
 
 ```mermaid
-flowchart LR
-    Q["question"] --> SCR["injection<br/>screener"]
-    SCR --> RET["retrieve top 5<br/>pgvector"]
-    RET --> G1{"score<br/>&ge; 0.45?"}
+flowchart TD
+    Q["question"] --> SCR["injection screener"]
+    SCR --> RET["retrieve top 5 from pgvector"]
+    RET --> G1{"best score &ge; 0.45?"}
     G1 -->|no| REF["REFUSE"]
-    G1 -->|yes| GEN["Gemini<br/>structured JSON"]
-    GEN --> G2{"cited real chunks<br/>and confident?"}
+    G1 -->|yes| GEN["Gemini, structured JSON"]
+    GEN --> G2{"cited real chunks, and confident?"}
     G2 -->|no| REF
-    G2 -->|yes| ANS["ANSWER<br/>+ citations"]
+    G2 -->|yes| ANS["ANSWER + citations"]
 
     style REF stroke-width:2px
     style ANS stroke-width:2px
