@@ -29,14 +29,54 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [sources, setSources] = useState<SourceInfo[] | null>(null);
+  // Distinguishes "still trying" from "gave up". Without it a single failed
+  // fetch is indistinguishable from a genuinely missing index.
+  const [sourcesState, setSourcesState] = useState<"loading" | "ready" | "failed">(
+    "loading",
+  );
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const threadRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    getSources()
-      .then((data) => setSources(data.sources))
-      .catch(() => setSources(null));
+    // Retry with backoff rather than giving up on the first failure.
+    //
+    // This is hosted on a free tier that suspends the container when idle, so
+    // the first request after a quiet period waits 30 to 50 seconds for a cold
+    // start. A single attempt on mount reliably lost that race and left the
+    // badge reading "index offline" on a perfectly healthy index, until the
+    // visitor reloaded. That is the default first impression for anyone opening
+    // the link cold, which is most people.
+    //
+    // Delays are spaced to cover a worst-case cold start: ~63s across 6 tries.
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const DELAYS_MS = [1000, 2000, 4000, 8000, 16000, 32000];
+
+    const attempt = (n: number) => {
+      getSources()
+        .then((data) => {
+          if (cancelled) return;
+          setSources(data.sources);
+          setSourcesState("ready");
+        })
+        .catch(() => {
+          if (cancelled) return;
+          if (n < DELAYS_MS.length) {
+            timer = setTimeout(() => attempt(n + 1), DELAYS_MS[n]);
+          } else {
+            // Every retry exhausted. Now "offline" is a claim worth making.
+            setSources(null);
+            setSourcesState("failed");
+          }
+        });
+    };
+    attempt(0);
+
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
@@ -118,12 +158,15 @@ export default function Chat() {
               className="sources-badge"
               onClick={() => setSourcesOpen((v) => !v)}
               disabled={!sources}
+              data-state={sourcesState}
               aria-expanded={sourcesOpen}
             >
               <span className="sources-dot" aria-hidden="true" />
               {sources
                 ? `${sources.length} sources indexed`
-                : "index offline"}
+                : sourcesState === "loading"
+                  ? "waking up…"
+                  : "index offline"}
             </button>
             {sourcesOpen && sources && (
               <div className="sources-panel">
