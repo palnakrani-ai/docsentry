@@ -18,6 +18,9 @@ langsmith>=0.3.0
 # Chroma because the index has to be rebuildable without a redeploy, and an
 # in-process store cached for the life of the process cannot be (see
 # INFRA-MIGRATION.md).
+# Schema migrations. The events table and the pgvector extension are created by
+# revisions under backend/alembic/versions, never by hand against a database.
+alembic>=1.13,<2.0
 langchain-postgres>=0.0.13,<0.1
 psycopg[binary]>=3.1,<4.0
 sqlalchemy>=2.0,<3.0

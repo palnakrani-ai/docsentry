@@ -340,3 +340,42 @@ was refused for having nothing citable, recorded as `ungrounded` rather than
 The threshold's job is narrower than it looked: it saves the cost of a model call
 on questions that are nowhere near the corpus. The grounding guarantee comes
 from the citation check behind it.
+
+## 14. Schema changes go through Alembic, and nothing else
+
+The data layer arrived with its schema in a raw SQL file mounted into the local
+Postgres container as init SQL. That worked exactly once. Pointing the project at
+Supabase meant applying the same DDL a second time, by hand, through a different
+tool, and from then on there were two copies of the truth with nothing checking
+that they agreed. Adding a column would have meant remembering both.
+
+Alembic now owns the schema. `backend/alembic/versions/` holds the revisions, the
+init-SQL mount is gone, and a fresh local database is built with
+`alembic upgrade head` rather than by starting a container.
+
+Three details worth keeping:
+
+**The connection string is not in `alembic.ini`.** `env.py` reads it from
+`app.db.database_url`, the same `DATABASE_URL` the application uses, so a
+migration cannot run against a database the app does not talk to. A URL
+duplicated into a config file is a URL that eventually points somewhere else.
+
+**Revisions are written by hand and `target_metadata` is `None`.** There is no
+SQLAlchemy model layer here. The vector tables are created and owned by
+langchain-postgres and the `events` table is written through plain SQL, so
+autogenerate would compare the database against metadata describing neither and
+offer to drop both.
+
+**Both databases were stamped, not migrated.** The local container and the
+Supabase project already had exactly what revision `ff44e962d75b` creates, so
+both were stamped at it. Running it would have tried to build what was already
+there.
+
+**Cost:** a dependency, a directory, and a step before the app runs on a fresh
+database. The alternative was remembering to apply the same DDL twice in two
+different places, which is not a practice so much as a habit waiting to be
+broken.
+
+Verified by building a throwaway database from the revision and reading back the
+table, both indexes, the extension and the RLS flag, then downgrading it to
+empty again. A migration nobody has run forward and backward is a guess.

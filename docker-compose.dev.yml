@@ -10,6 +10,14 @@
 #
 # Swapping this for Supabase later is a change to that one variable. Nothing in
 # the application code knows which of the two it is talking to.
+#
+# The container starts empty. Schema comes from Alembic and nowhere else:
+#
+#   cd backend && alembic upgrade head
+#
+# An init-SQL mount used to do this, which meant the same DDL lived in two
+# places and only one of them ever reached Supabase. One source of truth is the
+# reason to have migrations at all.
 
 services:
   db:
@@ -23,7 +31,6 @@ services:
       - "5433:5432"
     volumes:
       - docsentry-pgdata:/var/lib/postgresql/data
-      - ./backend/sql/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       # The app should wait for a database that can actually answer, not just
       # for an open port.
