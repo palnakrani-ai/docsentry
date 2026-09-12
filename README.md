@@ -10,9 +10,9 @@ pinned: false
 
 # DocSentry
 
-A RAG document Q&A demo with guardrails. It answers questions about a fictional outdoor gear retailer, Meridian Outfitters, strictly from the company's handbook and policy documents. Every answer carries citations, anything outside the docs gets a polite refusal, and prompt injection attempts are flagged and ignored. Ships as a single Docker image for Hugging Face Spaces.
+A RAG document Q&A demo with guardrails. It answers questions about a fictional outdoor gear retailer, Meridian Outfitters, strictly from the company's handbook and policy documents. Every answer carries citations, anything outside the docs gets a polite refusal, and prompt injection attempts are flagged and ignored. Ships as a Docker image, deployable as a single API service or as the full stack with a worker, scheduler, TLS and dashboards.
 
-Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-chroma`), Chroma embedded with the index built at Docker build time, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional LangSmith tracing.
+Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-postgres`), Postgres with pgvector holding both the index and a per-request audit trail, Celery and Redis for index rebuilds, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional Sentry and LangSmith. The index used to be a Chroma directory baked into the image at build time; `INFRA-MIGRATION.md` records why that had to change.
 
 The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee.
 
@@ -115,7 +115,8 @@ Backend (Python 3.11+):
 cd backend
 pip install -r requirements.txt
 export GEMINI_API_KEY=your_key_here   # PowerShell: $env:GEMINI_API_KEY="..."
-python -m app.ingest                  # builds backend/chroma_index
+alembic upgrade head                  # creates the schema, needs DATABASE_URL
+python -m app.ingest                  # embeds docs/ into pgvector
 uvicorn app.main:app --reload --port 7860
 ```
 
@@ -130,12 +131,22 @@ npm run dev                           # or run the Vite dev server instead
 
 Without a built frontend, the root URL serves a plain status message and the API remains fully usable.
 
-Env vars: `GEMINI_API_KEY` (required), `GEMINI_MODEL` (default `gemini-flash-lite-latest`), `GEMINI_EMBED_MODEL` (default `gemini-embedding-001`, auto-falls back to `text-embedding-004` on 404), `PORT` (Spaces sets 7860).
+Env vars: `GEMINI_API_KEY` (required), `DATABASE_URL` (required; a Postgres with the `vector` extension, e.g. the local container in `docker-compose.dev.yml` or a Supabase session-pooler URL, with the `postgresql+psycopg://` scheme), `GEMINI_MODEL` (default `gemini-flash-lite-latest`), `GEMINI_EMBED_MODEL` (default `gemini-embedding-001`, falls back to `gemini-embedding-2` on 404), `PORT` (default 7860). Optional: `SENTRY_DSN`, `TRUST_PROXY_HEADERS`. See `.env.example`.
+
+The embed model matters beyond configuration. The index records which model built it and queries read that back, so a query can never silently use a different model than the index. A *reindex* with the variable set differently does rebuild on that model, which is why it is named explicitly wherever the stack is deployed.
 
 Tracing is optional and off unless you set all three: `LANGSMITH_TRACING=true`, `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`. With them set, every request shows up in LangSmith as a four-step trace with token counts, per-step latency and the retrieved chunks.
 
-## Deploy to Hugging Face Spaces
+## Deploy
 
-1. Create a Space with the Docker SDK.
-2. In Space Settings, under Variables and secrets, add `GEMINI_API_KEY` as a Secret. Spaces exposes secrets to the Docker build, which this image uses to embed the docs during the build so the Space boots with a ready index.
-3. Push this repo to the Space. The Dockerfile builds the frontend, installs the backend, runs ingestion, and starts uvicorn on port 7860.
+The image builds the frontend, installs the backend, and starts uvicorn on port 7860. It does **not** build an index: the index lives in Postgres, so a deployment needs `DATABASE_URL` pointing at a database that already has one. Build-time secrets are no longer used for anything.
+
+**Whole stack, one host** (`docker-compose.yml`): api, Celery worker, Beat and Redis from a single image, behind Caddy for TLS, with Grafana over the `events` table. Copy `.env.example` to `.env`, fill it in, then `docker compose up -d --build`. This is the only arrangement where the index can be rebuilt without a redeploy, because rebuilding is a Celery task and needs the worker.
+
+**API only** (`render.yaml`): a single web service with no worker, no Beat and no Redis. It answers questions perfectly well and reports `degraded` on `/api/health`, because a missing broker means rebuilds are impossible, not that answers are. Set `GEMINI_API_KEY` and `DATABASE_URL` in the dashboard.
+
+Rebuild the index after editing anything in `backend/docs/`, from somewhere with a worker:
+
+```bash
+docker compose exec -T api python -c "from app.tasks import reindex; print(reindex.delay().get(timeout=1800))"
+```
