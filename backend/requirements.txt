@@ -14,7 +14,14 @@ langchain-text-splitters>=0.3,<1.0
 # Tracing. Inert unless LANGSMITH_TRACING=true is set.
 langsmith>=0.3.0
 
-chromadb>=1.0,<2.0
+# Vector store and the events audit trail, both in Postgres. pgvector replaced
+# Chroma because the index has to be rebuildable without a redeploy, and an
+# in-process store cached for the life of the process cannot be (see
+# INFRA-MIGRATION.md).
+langchain-postgres>=0.0.13,<0.1
+psycopg[binary]>=3.1,<4.0
+sqlalchemy>=2.0,<3.0
+
 google-genai>=1.0,<2.0
 
 # Evaluation only. Not imported by the application at runtime; tests/eval uses

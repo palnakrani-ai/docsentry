@@ -37,11 +37,25 @@ The moment ingest becomes a Celery task, it breaks. `rag.py:107` keeps `_store` 
 
 Moving the vectors into Supabase Postgres with pgvector fixes this by removing the local copy altogether. The worker writes embeddings to Postgres, the api reads from Postgres, and there is one source of truth. It also collapses two datastores into one, so a query event and the chunks it retrieved can be joined in the same database that Grafana already reads.
 
-## The 0.45 threshold is the risk in this migration
+## The 0.45 threshold was the risk, and it measured as unchanged
 
-`rag.py` refuses to answer when the best match scores below 0.45, using Chroma's `similarity_search_with_relevance_scores`. That number was tuned against Chroma's scoring. pgvector works in cosine distance on a different scale, so the same literal 0.45 means something else after the swap.
+`rag.py` refuses to answer when the best match scores below 0.45, using Chroma's
+`similarity_search_with_relevance_scores`. That number was tuned against Chroma's
+scoring, pgvector works in cosine distance, and nothing in the suite asserts the
+score scale, so it could have changed meaning without a test failing.
 
-That threshold is the grounding gate. It is the mechanism the whole demo is built on, and it can shift without a single test failing, because nothing in the suite asserts the score scale itself. Re-tune it against the 150-label evaluation set rather than by eye, and treat that as a gating step rather than cleanup afterwards.
+Measured across all 150 labelled questions with one shared query embedding per
+question: maximum absolute difference in top score **0.000000**, top-1 source
+agreement **150/150**, decisions changed at 0.45 **zero**. Both stores use the
+same embeddings, the same cosine distance and the same `1 - distance` formula,
+and at 235 chunks Chroma's approximate index is effectively exact. The threshold
+carries over untouched. Recorded with the failed first attempt at measuring it in
+`DECISIONS.md` section 13.
+
+The same data corrected something this plan assumed. All 26 unanswerable
+questions score above 0.45 and reach the model, on both stores. The threshold is
+not what catches them; the post-generation citation check is. The threshold only
+saves a model call on questions that are nowhere near the corpus.
 
 ## The events write stays off the response path
 
@@ -61,10 +75,22 @@ The one thing to watch is that Supabase pauses free-tier projects after about a 
 
 ## Build order
 
-1. Supabase project, with pgvector enabled and the `events` table created: question, refusal reason, citations, latency_ms, timestamp
-2. Wire `app/main.py` to write an event row per request, through `BackgroundTasks` so the response does not wait on it. No other behaviour change.
-3. Port the vector store from Chroma to pgvector: `app/ingest.py` and `rag.py:107-128`, swapping `Chroma` for `PGVector` from `langchain-postgres`, plus the `requirements.txt` change
-4. Re-tune the 0.45 relevance threshold against the 150-label set and re-run the retrieval metrics. Do not move on until the refusal behaviour matches what it was on Chroma.
+Steps 1 to 4 are done, against the local pgvector container in
+`docker-compose.dev.yml` rather than Supabase, so the port was verified before a
+hosted dependency entered it. Steps 5 onward are M2.6.
+
+1. ~~Postgres with pgvector and the `events` table.~~ Done as a local container.
+   `backend/sql/init/001_schema.sql` is the schema, and it applies to Supabase by
+   hand from the SQL editor when the project exists.
+2. ~~Wire `app/main.py` to write an event row per request, through
+   `BackgroundTasks`.~~ Done. `db.record_event` also swallows its own failures,
+   so a request that was answered correctly cannot fail because the record of it
+   could not be saved.
+3. ~~Port the vector store from Chroma to pgvector.~~ Done. `app/db.py` is new and
+   holds the connection, the audit write, and the collection queries that replace
+   Chroma's `.get()`, which PGVector has no equivalent for.
+4. ~~Re-tune the 0.45 relevance threshold against the 150-label set.~~ Done, and
+   it needed no change. See the section above.
 5. Move `app/ingest.py` into a Celery task, callable on demand instead of only at Docker build time. Drop the build-time ingest and the Hugging Face Spaces secret block from the Dockerfile.
 6. Docker Compose: api, worker, beat and redis on one box, pointed at the Supabase project
 7. Hetzner VPS, Cloudflare DNS and Caddy in front, then cut over from Render
@@ -77,8 +103,19 @@ The one thing to watch is that Supabase pauses free-tier projects after about a 
 M2's standing promise is that every published number is reproducible by the demo command. This migration changes the retrieval backend and the hosting, so several of them stop being true on the day of the cutover.
 
 - Latency and cost. The README currently reports p50 2,073 ms and p95 2,361 ms end to end at around 860 tokens, and the genesis records carry an earlier clean run at p50 1,495 ms and p95 1,762 ms. Both were measured elsewhere. Re-run `python -m tests.eval.run_trace_report` after cutover and update the README, `EXPLAINED.md` and `tests/eval/results/trace_report.md`.
-- The four-way ablation. Recall and MRR were measured against Chroma. Re-run `python -m tests.eval.run_ablation` and update the table wherever it appears, including `DECISIONS.md`.
+- The four-way ablation does **not** need re-running, which an earlier draft of this document got wrong. `tests/eval/retrievers.py` builds its own chunkings and computes cosine similarity in memory against a disk-backed embedding cache. It never touched Chroma and does not touch pgvector, so the store swap cannot move those numbers.
 - Run these one at a time. They share a Gemini rate limit and a contended run measures the contention rather than the system, which is the whole point of `DECISIONS.md` section 11.
+
+## The branch is not deployable, deliberately
+
+The image still runs `python -m app.ingest` at build time, and that now needs a
+database, so the Docker build fails on this branch. That is step 5's job to fix
+and it belongs with the Compose work rather than here.
+
+It also means this must not reach `main` while Render is still serving the live
+demo from a baked Chroma index. Merging before a database exists takes the
+flagship demo down. The order is: Supabase project first, then the Dockerfile and
+Compose changes, then merge, then cut over.
 
 ## Not urgent
 

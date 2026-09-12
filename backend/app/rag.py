@@ -13,8 +13,6 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
-import chromadb
-from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import (
@@ -23,11 +21,15 @@ from langchain_core.runnables import (
     RunnablePassthrough,
 )
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_postgres import PGVector
+from langchain_postgres.vectorstores import DistanceStrategy
 from pydantic import BaseModel, Field
 
+from .db import collection_cmetadata, database_url
+from .db import collection_metadatas as _db_collection_metadatas
+from .db import collection_stats as _db_collection_stats
 from .guardrails import FLAG_MODEL_UNAVAILABLE, FLAG_OFF_TOPIC, GROUNDING_SCORE_THRESHOLD
 from .ingest import (
-    CHROMA_DIR,
     COLLECTION_NAME,
     PRIMARY_EMBED_MODEL,
     build_embeddings,
@@ -84,6 +86,11 @@ class RagResult:
     # model actually saw. Scoring against the 200-character citation snippet
     # measures the snippet, not the system.
     retrieved_contexts: list[str] = field(default_factory=list)
+    # Best retrieval score for this question, the exact number the grounding
+    # gate compared against its threshold. Recorded on the event row so the
+    # threshold can be reviewed against live traffic rather than only against
+    # the labelled set it was tuned on.
+    top_score: float | None = None
 
 
 # Sentinel payload returned by the generation fallback. Identity-compared, so it
@@ -104,39 +111,42 @@ class RetrievedChunk:
 # Vector store
 # ---------------------------------------------------------------------------
 
-_store: Chroma | None = None
+_store: PGVector | None = None
 
 
-def get_store() -> Chroma:
-    """The Chroma vector store, built with whichever model indexed it.
+def get_store() -> PGVector:
+    """The pgvector store, built with whichever model indexed it.
 
     ingest.py records the embedding model in the collection metadata because
     it may have fallen back from the primary. Querying with a different model
     than the index was built with silently returns nonsense, so the model is
     read back rather than assumed.
+
+    Caching the handle here is safe in a way caching Chroma was not. This holds
+    a connection pool, not a copy of the data, so an index rebuilt by another
+    process is visible to the next query rather than invisible until restart.
     """
     global _store
     if _store is None:
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        metadata = client.get_collection(COLLECTION_NAME).metadata or {}
+        metadata = collection_cmetadata(COLLECTION_NAME)
         embed_model = metadata.get("embed_model", PRIMARY_EMBED_MODEL)
-        _store = Chroma(
-            client=client,
+        _store = PGVector(
             collection_name=COLLECTION_NAME,
-            embedding_function=build_embeddings(embed_model),
+            connection=database_url(),
+            embeddings=build_embeddings(embed_model),
+            distance_strategy=DistanceStrategy.COSINE,
+            use_jsonb=True,
         )
     return _store
 
 
 def collection_stats() -> tuple[int, int]:
     """Return (document_count, chunk_count) for the health and sources routes."""
-    records = get_store().get(include=["metadatas"])
-    sources = {m.get("source") for m in records["metadatas"] if m.get("source")}
-    return len(sources), len(records["ids"])
+    return _db_collection_stats(COLLECTION_NAME)
 
 
 def collection_metadatas() -> list[dict]:
-    return list(get_store().get(include=["metadatas"])["metadatas"])
+    return _db_collection_metadatas(COLLECTION_NAME)
 
 
 # ---------------------------------------------------------------------------
@@ -181,12 +191,20 @@ def _format_context(state: dict[str, Any]) -> dict[str, str]:
     return {"context": "\n".join(parts), "question": state["question"]}
 
 
-def _refuse(extra_flags: list[str] | None = None) -> RagResult:
+def _top_score(chunks: list[RetrievedChunk] | None) -> float | None:
+    return max((c.score for c in chunks), default=None) if chunks else None
+
+
+def _refuse(
+    extra_flags: list[str] | None = None,
+    chunks: list[RetrievedChunk] | None = None,
+) -> RagResult:
     return RagResult(
         answer=REFUSAL_MESSAGE,
         citations=[],
         refused=True,
         flags=list(extra_flags or []),
+        top_score=_top_score(chunks),
     )
 
 
@@ -203,19 +221,19 @@ def _verify_and_build(state: dict[str, Any]) -> RagResult:
         # The generation call failed after its retries. This is an outage, not a
         # grounding decision, and it is flagged so an evaluation does not score
         # it as a correct refusal.
-        return _refuse([FLAG_MODEL_UNAVAILABLE])
+        return _refuse([FLAG_MODEL_UNAVAILABLE], state["chunks"])
 
     if payload is None:
         # with_structured_output returns None rather than raising when the
         # model produces nothing parseable, so the fallback above never fires.
         # No payload means no grounded answer, which means refuse.
-        return _refuse()
+        return _refuse(chunks=state["chunks"])
 
     by_label = {c.label: c for c in state["chunks"]}
     cited = [by_label[cid] for cid in payload.citedChunkIds if cid in by_label]
 
     if not cited or not payload.confident:
-        return _refuse()
+        return _refuse(chunks=state["chunks"])
 
     citations = [
         Citation(
@@ -230,6 +248,7 @@ def _verify_and_build(state: dict[str, Any]) -> RagResult:
         citations=citations,
         refused=False,
         retrieved_contexts=[c.text for c in state["chunks"]],
+        top_score=_top_score(state["chunks"]),
     )
 
 
@@ -282,7 +301,7 @@ def _build_chain() -> Any:
             chunks=RunnableLambda(_retrieve).with_config(run_name="retrieve")
         )
         | RunnableBranch(
-            (_is_ungrounded, RunnableLambda(lambda _: _refuse([FLAG_OFF_TOPIC]))),
+            (_is_ungrounded, RunnableLambda(lambda st: _refuse([FLAG_OFF_TOPIC], st["chunks"]))),
             generate,
         ).with_config(run_name="grounding_gate")
     ).with_config(run_name="docsentry_rag")
@@ -299,7 +318,7 @@ def answer_question(question: str) -> RagResult:
     """Full RAG pipeline for one validated question.
 
     Model failures are absorbed into a refusal by the fallback in the chain.
-    Infrastructure failures (missing index, Chroma unreachable) are left to
+    Infrastructure failures (missing index, Postgres unreachable) are left to
     propagate so main.py can answer 503 instead of pretending to refuse.
     """
     return get_chain().invoke({"question": question})

@@ -4,13 +4,13 @@ import time
 from collections import defaultdict, deque
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import guardrails, rag
+from . import db, guardrails, rag
 from .ingest import BASE_DIR
 from .schemas import (
     ChatRequest,
@@ -69,7 +69,9 @@ def check_rate_limit(request: Request) -> None:
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-def chat(body: ChatRequest, request: Request) -> ChatResponse:
+def chat(
+    body: ChatRequest, request: Request, background: BackgroundTasks
+) -> ChatResponse:
     check_rate_limit(request)
     started = time.perf_counter()
 
@@ -83,7 +85,7 @@ def chat(body: ChatRequest, request: Request) -> ChatResponse:
         result = rag.answer_question(cleaned)
     except HTTPException:
         raise
-    except Exception as exc:  # chroma missing, Gemini outage, etc.
+    except Exception as exc:  # index missing, Postgres down, Gemini outage, etc.
         raise HTTPException(
             status_code=503, detail=f"Answer generation failed: {exc}"
         ) from exc
@@ -93,6 +95,23 @@ def chat(body: ChatRequest, request: Request) -> ChatResponse:
             flags.append(flag)
 
     latency_ms = int((time.perf_counter() - started) * 1000)
+
+    # The audit row is queued rather than written here. It runs after the
+    # response is sent, so a slow or unreachable database costs the user
+    # nothing, and db.record_event swallows its own failures for the same
+    # reason. A request that was answered correctly must not turn into an error
+    # because the record of it could not be saved.
+    background.add_task(
+        db.record_event,
+        question=cleaned,
+        answered=not result.refused,
+        refusal_reason=_refusal_reason(result, flags),
+        citations=[c.model_dump() for c in result.citations],
+        flags=flags,
+        top_score=result.top_score,
+        latency_ms=latency_ms,
+    )
+
     return ChatResponse(
         answer=result.answer,
         citations=result.citations,
@@ -100,6 +119,21 @@ def chat(body: ChatRequest, request: Request) -> ChatResponse:
         flags=flags,
         latencyMs=latency_ms,
     )
+
+
+def _refusal_reason(result: rag.RagResult, flags: list[str]) -> str | None:
+    """Why this request refused, in one word, or None if it answered.
+
+    Ordered most specific first. model_unavailable matters most because it is
+    the one reason that is an outage rather than a decision, and the M2
+    evaluation work turned on being able to tell those apart after the fact.
+    """
+    if not result.refused:
+        return None
+    for flag in (guardrails.FLAG_MODEL_UNAVAILABLE, guardrails.FLAG_OFF_TOPIC):
+        if flag in flags:
+            return flag
+    return "ungrounded"
 
 
 @app.get("/api/health", response_model=HealthResponse)
