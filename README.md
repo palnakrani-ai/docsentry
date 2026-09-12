@@ -4,26 +4,7 @@ A RAG document Q&A demo with guardrails. It answers questions about a fictional 
 
 Stack: FastAPI, LangChain 1.0 (LCEL chain, `langchain-google-genai`, `langchain-postgres`), Postgres with pgvector holding both the index and a per-request audit trail, Celery and Redis for index rebuilds, Gemini for embeddings and answers, React + Vite frontend served as static files by FastAPI. Optional Sentry and LangSmith. The index used to be a Chroma directory baked into the image at build time; `INFRA-MIGRATION.md` records why that had to change.
 
-The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee.
-
-```mermaid
-flowchart TD
-    Q["question"] --> SCR["injection screener"]
-    SCR --> RET["retrieve top 5 from pgvector"]
-    RET --> G1{"best score &ge; 0.45?"}
-    G1 -->|no| REF["REFUSE"]
-    G1 -->|yes| GEN["Gemini, structured JSON"]
-    GEN --> G2{"cited real chunks, and confident?"}
-    G2 -->|no| REF
-    G2 -->|yes| ANS["ANSWER + citations"]
-
-    style REF stroke-width:2px
-    style ANS stroke-width:2px
-    style G1 stroke-width:2px
-    style G2 stroke-width:2px
-```
-
-The two diamonds are the product. Everything else is plumbing.
+The chain is `retrieve -> grounding gate -> generate -> verify`. LangChain handles composition, retrieval and structured output. The two checks that decide whether an answer is allowed to reach the user stay in plain Python inside Runnables: an instruction telling a model to be careful is not the same thing as a guarantee. Those two checks are drawn out under [How an answer is decided](#how-an-answer-is-decided).
 
 ## Guardrails
 
@@ -117,6 +98,27 @@ calling the API: a contended run reports contention, not the system.
 > `INFRA-MIGRATION.md` and `DECISIONS.md` section 13.
 
 `DECISIONS.md` records why each of these choices was made and what it costs.
+
+## How an answer is decided
+
+```mermaid
+flowchart TD
+    Q["question"] --> SCR["injection screener"]
+    SCR --> RET["retrieve top 5 from pgvector"]
+    RET --> G1{"best score &ge; 0.45?"}
+    G1 -->|no| REF["REFUSE"]
+    G1 -->|yes| GEN["Gemini, structured JSON"]
+    GEN --> G2{"cited real chunks, and confident?"}
+    G2 -->|no| REF
+    G2 -->|yes| ANS["ANSWER + citations"]
+
+    style REF stroke-width:2px
+    style ANS stroke-width:2px
+    style G1 stroke-width:2px
+    style G2 stroke-width:2px
+```
+
+The two diamonds are the product. Everything else is plumbing.
 
 ## API
 
